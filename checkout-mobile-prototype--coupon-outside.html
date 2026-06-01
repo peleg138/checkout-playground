@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Appcharge Checkout — Coupon Outside (Exploration)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: '#7c3aed',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body { background: #f0f0f0; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 24px 0; }
+    #phone { width: 375px; background: #fff; border-radius: 44px; overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,0.18); }
+    .promo-input-wrap { transition: box-shadow 0.15s, border-color 0.15s; }
+    .promo-input-wrap:focus-within { border-color: #7c3aed !important; box-shadow: 0 0 0 2px #7c3aed33; }
+    .expand-area { overflow: hidden; transition: height 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.25s cubic-bezier(0.4,0,0.2,1); }
+    .chevron { transition: transform 0.2s ease; }
+    .chevron.open { transform: rotate(180deg); }
+    /* Annotation banner */
+    .annotation { background: #fef3c7; border: 1px solid #fbbf24; color: #92400e; font-size: 11px; line-height: 1.4; padding: 6px 12px; text-align: center; font-family: system-ui, sans-serif; }
+  </style>
+</head>
+<body>
+
+<div style="display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;">
+
+  <!-- Annotation banner above phone -->
+  <div style="width:375px;background:#fef3c7;border:1px solid #fbbf24;color:#92400e;font-size:11px;line-height:1.4;padding:8px 14px;border-radius:8px;font-family:system-ui,sans-serif;text-align:center;">
+    <strong>Exploration only — do not ship.</strong><br>
+    Coupon field is always visible, outside the Details collapse/expand.
+  </div>
+
+  <div id="phone">
+
+    <!-- ── STATUS BAR ─────────────────────────────────────────────── -->
+    <div style="height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:#fff;">
+      <span style="font-size:15px;font-weight:600;font-family:system-ui,sans-serif;">9:41</span>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <!-- signal bars -->
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none"><rect x="0" y="3" width="3" height="9" rx="1" fill="#09090b"/><rect x="4.75" y="2" width="3" height="10" rx="1" fill="#09090b"/><rect x="9.5" y="1" width="3" height="11" rx="1" fill="#09090b"/><rect x="14.25" y="0" width="3" height="12" rx="1" fill="#09090b"/></svg>
+        <!-- wifi -->
+        <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M8 9.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zm0-3.5C9.8 6 11.4 6.8 12.5 8l1.1-1.1A7.5 7.5 0 0 0 8 4.5 7.5 7.5 0 0 0 2.4 6.9L3.5 8C4.6 6.8 6.2 6 8 6zm0-5C10.9 1 13.5 2.2 15.4 4.1L16.5 3A10 10 0 0 0 8 0 10 10 0 0 0-.5 3L.6 4.1C2.5 2.2 5.1 1 8 1z" fill="#09090b"/></svg>
+        <!-- battery -->
+        <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#09090b" stroke-opacity=".35"/><rect x="2" y="2" width="18" height="8" rx="2" fill="#09090b"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#09090b" fill-opacity=".4"/></svg>
+      </div>
+    </div>
+
+    <!-- ── CHECKOUT HEADER (white card) ──────────────────────────── -->
+    <div id="checkout-header" style="background:#fff;padding:0 16px;">
+
+      <!-- Close row -->
+      <div style="height:44px;display:flex;align-items:center;justify-content:flex-end;padding:5px 0;">
+        <button onclick="alert('close')" style="color:#09090b;display:flex;align-items:center;justify-content:center;background:none;border:none;cursor:pointer;padding:4px;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <!-- Logo + Title + Details toggle -->
+      <div style="display:flex;align-items:center;gap:8px;padding-bottom:12px;">
+        <!-- Logo placeholder -->
+        <div style="width:44px;height:44px;border-radius:4.4px;background:linear-gradient(135deg,#7c3aed,#a855f7);flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 2l2.5 6.5H20l-5.5 4 2 6.5L11 15l-5.5 3.5 2-6.5L2 8.5h6.5L11 2z" fill="white"/></svg>
+        </div>
+        <!-- Title -->
+        <div style="flex:1;display:flex;align-items:center;gap:8px;">
+          <span style="font-size:14px;line-height:24px;font-weight:600;color:#09090b;font-family:system-ui,sans-serif;">Summer Bundle Pack</span>
+        </div>
+        <!-- Details toggle -->
+        <button id="details-toggle" onclick="toggleExpand()" style="display:flex;align-items:center;gap:2px;padding:8px 0;background:none;border:none;cursor:pointer;color:#09090b;">
+          <!-- Tag icon -->
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="flex-shrink:0;">
+            <path d="M3 3.833A.833.833 0 0 1 3.833 3H8.82c.221 0 .433.088.589.244l7.084 7.083a.833.833 0 0 1 0 1.179l-5.49 5.487a.833.833 0 0 1-1.178 0L2.743 9.91A.833.833 0 0 1 2.5 9.32V3.833z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+            <circle cx="5.833" cy="5.833" r="1.042" fill="currentColor"/>
+          </svg>
+          <span style="font-size:12px;line-height:16px;font-weight:600;min-width:41px;width:41px;text-align:center;font-family:system-ui,sans-serif;">Details</span>
+          <!-- Chevron -->
+          <svg id="chevron" class="chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" style="flex-shrink:0;">
+            <path d="M5 7.5l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <!-- COUPON FIELD — always visible, outside collapse/expand     -->
+      <!-- ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+      <div id="promo-section" style="padding-bottom:12px;">
+        <div id="promo-wrap" class="promo-input-wrap" style="display:flex;align-items:center;height:40px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;padding:0 12px;gap:8px;transition:border-color 0.15s,box-shadow 0.15s;">
+          <input
+            id="promo-input"
+            type="text"
+            placeholder="Promo code"
+            oninput="handlePromoInput(this)"
+            onkeydown="if(event.key==='Enter')applyPromo()"
+            style="flex:1;min-width:0;background:transparent;outline:none;font-size:14px;line-height:20px;font-weight:400;color:#09090b;font-family:system-ui,sans-serif;border:none;"
+          />
+          <!-- Tag icon (idle, empty) -->
+          <span id="promo-tag-icon">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;">
+              <path d="M2 2.667A.667.667 0 0 1 2.667 2H7.06c.177 0 .346.07.471.195l5.667 5.667a.667.667 0 0 1 0 .943l-4.393 4.39a.667.667 0 0 1-.943 0L2.195 7.529A.667.667 0 0 1 2 7.06V2.667z" stroke="#9ca3af" stroke-width="1.2" stroke-linejoin="round"/>
+              <circle cx="4.667" cy="4.667" r="0.833" fill="#9ca3af"/>
+            </svg>
+          </span>
+          <!-- Apply button (idle, has text) -->
+          <button id="promo-apply-btn" onclick="applyPromo()" style="display:none;font-size:14px;line-height:20px;font-weight:500;color:#7c3aed;background:none;border:none;cursor:pointer;white-space:nowrap;flex-shrink:0;font-family:system-ui,sans-serif;">Apply</button>
+          <!-- Success state -->
+          <span id="promo-success" style="display:none;align-items:center;gap:8px;flex-shrink:0;">
+            <button onclick="clearPromo()" style="font-size:12px;line-height:16px;font-weight:400;color:#6b7280;background:#f3f4f6;border-radius:9999px;padding:2px 8px;white-space:nowrap;border:none;cursor:pointer;font-family:system-ui,sans-serif;">Remove</button>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#22c55e"/><path d="M5.5 9.5l2.5 2.5 4.5-5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <!-- Error state -->
+          <button id="promo-error-clear" onclick="clearPromo()" style="display:none;flex-shrink:0;background:none;border:none;cursor:pointer;padding:0;" aria-label="Clear">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="9" fill="#ef4444"/><path d="M6 6l6 6M12 6l-6 6" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+        <!-- Error message -->
+        <p id="promo-error-msg" style="display:none;font-size:12px;color:#ef4444;margin:4px 0 0;font-family:system-ui,sans-serif;"></p>
+      </div>
+
+      <!-- Collapsed total row -->
+      <div id="collapsed-total" style="display:flex;align-items:baseline;justify-content:space-between;padding-bottom:12px;">
+        <span style="font-size:16px;line-height:24px;font-weight:700;color:#09090b;font-family:system-ui,sans-serif;">Total</span>
+        <span id="total-amount" style="font-size:17px;line-height:24px;font-weight:700;color:#09090b;font-family:system-ui,sans-serif;">$49.99</span>
+      </div>
+      <div id="collapsed-divider" style="height:1px;background:#e5e7eb;margin:0 -16px;"></div>
+
+      <!-- ── EXPANDED area ──────────────────────────────────────── -->
+      <div id="expand-area" class="expand-area" style="height:0;opacity:0;margin:0 -16px;">
+        <div style="padding:16px 16px 0;">
+
+          <!-- Items list -->
+          <div style="background:#f4f4f5;border-radius:7px;overflow:hidden;margin-bottom:16px;max-height:128px;overflow-y:auto;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:51px;min-height:51px;">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:33px;height:33px;border-radius:4px;background:linear-gradient(135deg,#f59e0b,#fbbf24);flex-shrink:0;"></div>
+                <span style="font-size:14px;line-height:20px;font-weight:400;color:#09090b;font-family:system-ui,sans-serif;">Golden Pack ×3</span>
+              </div>
+              <span style="font-size:14px;line-height:20px;font-weight:400;color:#09090b;font-family:system-ui,sans-serif;">3</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:51px;min-height:51px;">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <div style="width:33px;height:33px;border-radius:4px;background:linear-gradient(135deg,#6366f1,#8b5cf6);flex-shrink:0;"></div>
+                <span style="font-size:14px;line-height:20px;font-weight:400;color:#09090b;font-family:system-ui,sans-serif;">Season Pass</span>
+              </div>
+              <span style="font-size:14px;line-height:20px;font-weight:400;color:#09090b;font-family:system-ui,sans-serif;">1</span>
+            </div>
+          </div>
+
+          <!-- Pricing rows -->
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;justify-content:space-between;font-size:14px;line-height:20px;font-weight:400;color:#09090b;font-family:system-ui,sans-serif;">
+              <span>Subtotal</span><span>$49.99</span>
+            </div>
+            <div id="promo-discount-row" style="display:none;justify-content:space-between;font-size:14px;line-height:20px;font-weight:400;color:#22c55e;font-family:system-ui,sans-serif;">
+              <span>Promocode</span><span id="promo-discount-amount">-$5.00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:14px;line-height:20px;font-weight:400;color:#09090b;font-family:system-ui,sans-serif;">
+              <span>Tax (0%)</span><span>$0.00</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;font-size:16px;line-height:24px;font-weight:700;color:#09090b;height:32px;border-bottom:1px solid #e4e4e7;margin:0 -16px;padding:0 16px;font-family:system-ui,sans-serif;">
+              <span>Total</span><span id="total-amount-expanded">$49.99</span>
+            </div>
+          </div>
+
+          <div style="height:16px;"></div>
+        </div>
+      </div>
+      <!-- /expand-area -->
+
+    </div>
+    <!-- /checkout-header -->
+
+    <!-- ── PAYMENT AREA ───────────────────────────────────────────── -->
+    <div style="padding:16px;display:flex;flex-direction:column;gap:12px;background:#fff;">
+
+      <!-- Apple Pay (express) -->
+      <button style="width:100%;height:44px;background:#000;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+        <svg width="17" height="20" viewBox="0 0 17 20" fill="none"><path d="M14.22 10.32c-.02-2.5 2.04-3.7 2.13-3.76-1.16-1.7-2.97-1.93-3.62-1.96-1.54-.16-3 .91-3.78.91-.78 0-1.99-.89-3.27-.86C3.94 4.68 2.3 5.6 1.42 7.07c-1.8 3.1-.46 7.7 1.28 10.22.85 1.24 1.87 2.62 3.2 2.57 1.28-.05 1.77-.83 3.32-.83 1.55 0 1.99.83 3.34.8 1.38-.02 2.26-1.25 3.1-2.49.98-1.43 1.39-2.82 1.41-2.89-.03-.01-2.7-1.03-2.73-4.1l-.12-.03z" fill="white"/><path d="M11.82 3.26C12.52 2.4 13 1.22 12.87 0c-1.02.04-2.27.68-3 1.54-.66.76-1.24 1.97-1.08 3.13 1.13.09 2.29-.58 3.03-1.41z" fill="white"/></svg>
+        <span style="color:white;font-size:15px;font-weight:500;font-family:system-ui,sans-serif;">Pay</span>
+      </button>
+
+      <!-- Divider -->
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="flex:1;height:1px;background:#e5e7eb;"></div>
+        <span style="font-size:12px;color:#9ca3af;font-family:system-ui,sans-serif;">or pay with card</span>
+        <div style="flex:1;height:1px;background:#e5e7eb;"></div>
+      </div>
+
+      <!-- Card form placeholder -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <input type="text" placeholder="Card number" style="width:100%;height:40px;border:1px solid #e5e7eb;border-radius:6px;padding:0 12px;font-size:14px;font-family:system-ui,sans-serif;outline:none;box-sizing:border-box;" />
+        <div style="display:flex;gap:10px;">
+          <input type="text" placeholder="MM/YY" style="flex:1;height:40px;border:1px solid #e5e7eb;border-radius:6px;padding:0 12px;font-size:14px;font-family:system-ui,sans-serif;outline:none;" />
+          <input type="text" placeholder="CVV" style="flex:1;height:40px;border:1px solid #e5e7eb;border-radius:6px;padding:0 12px;font-size:14px;font-family:system-ui,sans-serif;outline:none;" />
+        </div>
+        <input type="text" placeholder="Cardholder name" style="width:100%;height:40px;border:1px solid #e5e7eb;border-radius:6px;padding:0 12px;font-size:14px;font-family:system-ui,sans-serif;outline:none;box-sizing:border-box;" />
+      </div>
+
+      <!-- Pay button -->
+      <button style="width:100%;height:48px;background:#7c3aed;border-radius:8px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <span style="color:white;font-size:16px;font-weight:600;font-family:system-ui,sans-serif;">Pay $49.99</span>
+      </button>
+
+      <!-- Security badge -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1L2 3v3.5c0 2.5 1.9 4.8 4.5 5.5C9.1 11.3 11 9 11 6.5V3L6.5 1z" stroke="#9ca3af" stroke-width="1.1" stroke-linejoin="round"/><path d="M4.5 6.5l1.5 1.5 2.5-3" stroke="#9ca3af" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="font-size:11px;color:#9ca3af;font-family:system-ui,sans-serif;">Payments are secure and encrypted</span>
+      </div>
+    </div>
+
+    <!-- ── HOME INDICATOR ─────────────────────────────────────────── -->
+    <div style="height:34px;background:#fff;display:flex;align-items:flex-end;justify-content:center;padding-bottom:8px;">
+      <div style="width:134px;height:5px;background:#09090b;border-radius:9999px;opacity:0.18;"></div>
+    </div>
+
+  </div><!-- /phone -->
+</div><!-- /wrapper -->
+
+<script>
+  const SUBTOTAL = 49.99;
+  const PROMO_DISCOUNT = 5.00;
+  const VALID_CODE = 'SUMMER10';
+
+  let promoState = 'idle'; // idle | success | error
+
+  function handlePromoInput(input) {
+    const val = input.value.toUpperCase();
+    input.value = val;
+    const tagIcon = document.getElementById('promo-tag-icon');
+    const applyBtn = document.getElementById('promo-apply-btn');
+    tagIcon.style.display = val.trim() ? 'none' : 'inline';
+    applyBtn.style.display = val.trim() ? 'inline' : 'none';
+  }
+
+  function applyPromo() {
+    const input = document.getElementById('promo-input');
+    const val = input.value.trim();
+    if (!val) return;
+
+    if (val === VALID_CODE) {
+      setPromoState('success');
+    } else {
+      setPromoState('error', 'Invalid promo code. Try SUMMER10.');
+    }
+  }
+
+  function clearPromo() {
+    const input = document.getElementById('promo-input');
+    input.value = '';
+    input.readOnly = false;
+    setPromoState('idle');
+  }
+
+  function setPromoState(state, msg) {
+    promoState = state;
+    const wrap = document.getElementById('promo-wrap');
+    const input = document.getElementById('promo-input');
+    const tagIcon = document.getElementById('promo-tag-icon');
+    const applyBtn = document.getElementById('promo-apply-btn');
+    const successEl = document.getElementById('promo-success');
+    const errorClear = document.getElementById('promo-error-clear');
+    const errorMsg = document.getElementById('promo-error-msg');
+    const discountRow = document.getElementById('promo-discount-row');
+
+    // Reset all
+    tagIcon.style.display = 'none';
+    applyBtn.style.display = 'none';
+    successEl.style.display = 'none';
+    errorClear.style.display = 'none';
+    errorMsg.style.display = 'none';
+    discountRow.style.display = 'none';
+    wrap.style.borderColor = '#e5e7eb';
+    input.style.color = '#09090b';
+    input.readOnly = false;
+
+    if (state === 'idle') {
+      tagIcon.style.display = 'inline';
+      updateTotal(SUBTOTAL);
+    } else if (state === 'success') {
+      successEl.style.display = 'flex';
+      wrap.style.borderColor = '#22c55e';
+      input.readOnly = true;
+      discountRow.style.display = 'flex';
+      updateTotal(SUBTOTAL - PROMO_DISCOUNT);
+    } else if (state === 'error') {
+      errorClear.style.display = 'inline';
+      wrap.style.borderColor = '#ef4444';
+      input.style.color = '#ef4444';
+      errorMsg.textContent = msg || 'Invalid promo code.';
+      errorMsg.style.display = 'block';
+      updateTotal(SUBTOTAL);
+    }
+  }
+
+  function updateTotal(amount) {
+    const fmt = '$' + amount.toFixed(2);
+    document.getElementById('total-amount').textContent = fmt;
+    document.getElementById('total-amount-expanded').textContent = fmt;
+    // Update pay button
+    document.querySelector('button[style*="Pay $"]') && null; // skip, static
+  }
+
+  let expanded = false;
+
+  function toggleExpand() {
+    expanded = !expanded;
+    const area = document.getElementById('expand-area');
+    const chevron = document.getElementById('chevron');
+    const collapsedTotal = document.getElementById('collapsed-total');
+    const collapsedDivider = document.getElementById('collapsed-divider');
+
+    if (expanded) {
+      area.style.opacity = '1';
+      // Measure content height for animation
+      area.style.height = 'auto';
+      const h = area.scrollHeight;
+      area.style.height = '0';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { area.style.height = h + 'px'; });
+      });
+      chevron.classList.add('open');
+      collapsedTotal.style.display = 'none';
+      collapsedDivider.style.display = 'none';
+    } else {
+      area.style.height = '0';
+      area.style.opacity = '0';
+      chevron.classList.remove('open');
+      collapsedTotal.style.display = 'flex';
+      collapsedDivider.style.display = 'block';
+    }
+  }
+</script>
+</body>
+</html>
