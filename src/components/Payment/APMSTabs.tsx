@@ -75,7 +75,7 @@ export function APMSTabs({ selected, onSelect, hasExpress, enabledMethods }: APM
               >
                 <div className="flex items-center justify-center gap-[3px]">
                   <CreditCard size={18} strokeWidth={1.5} className="flex-shrink-0" />
-                  <span className="text-[12px] font-normal text-black leading-none">Card</span>
+                  <span className="text-[14px] font-normal text-black leading-none">Card</span>
                 </div>
               </button>
             )
@@ -83,20 +83,20 @@ export function APMSTabs({ selected, onSelect, hasExpress, enabledMethods }: APM
           if (tab.id === 'paypal') {
             return (
               <button key="paypal" onClick={() => onSelect('paypal')} className={imgTabClass(active)} style={active ? { backgroundColor: `${pc}18` } : {}}>
-                <img src={paypalSrc} alt="PayPal" className={`w-full h-full object-fill${active ? ' mix-blend-multiply' : ''}`} draggable={false} />
+                <img src={paypalSrc} alt="PayPal" className={`w-full h-full object-fill scale-[1.15]${active ? ' mix-blend-multiply' : ''}`} draggable={false} />
               </button>
             )
           }
           if (tab.id === 'gpay') {
             return (
               <button key="gpay" onClick={() => onSelect('gpay')} className={imgTabClass(active)} style={active ? { backgroundColor: `${pc}18` } : {}}>
-                <img src={gpaySrc} alt="Google Pay" className={`w-full h-full object-fill${active ? ' mix-blend-multiply' : ''}`} draggable={false} />
+                <img src={gpaySrc} alt="Google Pay" className={`w-full h-full object-fill scale-[1.15]${active ? ' mix-blend-multiply' : ''}`} draggable={false} />
               </button>
             )
           }
           return (
             <button key="other" onClick={() => onSelect('other')} className={imgTabClass(active)} style={active ? { backgroundColor: `${pc}18` } : {}}>
-              <img src={otherSrc} alt="Other" className={`w-full h-full object-fill${active ? ' mix-blend-multiply' : ''}`} draggable={false} />
+              <img src={otherSrc} alt="Other" className={`w-full h-full object-fill scale-[1.1]${active ? ' mix-blend-multiply' : ''}`} draggable={false} />
             </button>
           )
         })}

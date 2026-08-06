@@ -82,7 +82,7 @@ export function AddCardSheet({ isOpen, effectiveTotal, onClose, onAdd }: AddCard
                 <div className="flex items-center gap-1">
                   <ShieldCheck size={18} strokeWidth={1.5} color="#3f3f46" className="flex-shrink-0" />
                   <span className="text-[14px] leading-5 font-normal text-[#71717a]">
-                    All payments are secure and encrypted
+                    Secure and encrypted
                   </span>
                 </div>
               </div>

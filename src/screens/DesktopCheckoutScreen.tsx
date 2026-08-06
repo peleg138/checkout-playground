@@ -179,6 +179,8 @@ export function DesktopCheckoutScreen({
             <OrderSummary
               paddingClass="px-0"
               isDesktop={isDesktop}
+              isLandscape={!isDesktop}
+              showPromoImages
               promoCode={state.promoCode}
               promoStatus={state.promoStatus}
               promoDiscount={state.promoDiscount}
@@ -358,7 +360,7 @@ export function DesktopCheckoutScreen({
                 {/* Shield subtitle */}
                 <div className="flex items-center gap-1 mb-1">
                   <ShieldCheck size={18} strokeWidth={1.5} color="#3f3f46" className="flex-shrink-0" />
-                  <span className="text-[14px] leading-5 font-normal text-[#71717a]">All payments are secure and encrypted</span>
+                  <span className="text-[14px] leading-5 font-normal text-[#71717a]">Secure and encrypted</span>
                 </div>
 
                 {/* Fields */}
@@ -433,34 +435,7 @@ export function DesktopCheckoutScreen({
 
             {/* Express button */}
             {state.hasExpressMethods && (
-              isDesktop ? (
-                <>
-                  <div className="px-4 pt-6 pb-0">
-                    <button
-                      onClick={handleApplePay}
-                      className="w-full"
-                      aria-label={EXPRESS_ASSETS_MAP[state.expressButtonType as keyof typeof EXPRESS_ASSETS_MAP]?.label ?? 'Express Pay'}
-                      style={{ height: 44, padding: 0, background: 'transparent', border: 'none', display: 'flex' }}
-                    >
-                      <div style={{ width: '100%', height: 44, borderRadius: 8, overflow: 'hidden', flexShrink: 0, background: EXPRESS_ASSETS_MAP[state.expressButtonType as keyof typeof EXPRESS_ASSETS_MAP]?.bg ?? '#000000' }}>
-                        <img
-                          src={EXPRESS_ASSETS_MAP[state.expressButtonType as keyof typeof EXPRESS_ASSETS_MAP]?.src ?? applePaySrc}
-                          alt={EXPRESS_ASSETS_MAP[state.expressButtonType as keyof typeof EXPRESS_ASSETS_MAP]?.label ?? 'Express Pay'}
-                          draggable={false}
-                          style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-                        />
-                      </div>
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-3 px-5 pt-[18px] pb-[4px]">
-                    <div className="flex-1 h-px bg-[#e4e4e7]" />
-                    <span className="text-[15px] font-normal text-[#71717a] whitespace-nowrap">Or pay another way</span>
-                    <div className="flex-1 h-px bg-[#e4e4e7]" />
-                  </div>
-                </>
-              ) : (
-                <ApplePayButton compact onClick={handleApplePay} type={state.expressButtonType} />
-              )
+              <ApplePayButton compact onClick={handleApplePay} type={state.expressButtonType} />
             )}
 
             {/* APMs tabs */}
@@ -493,22 +468,22 @@ export function DesktopCheckoutScreen({
                     <span className={`${isDesktop ? 'text-[17px]' : 'text-[16px]'} leading-6 font-semibold text-[#09090b]`}>Pay with PayPal</span>
                     <div className="flex items-center gap-1">
                       <ShieldCheck size={18} strokeWidth={1.5} color="#3f3f46" />
-                      <span className={`${isDesktop ? 'text-[15px]' : 'text-[14px]'} leading-5 font-normal text-[#71717a]`}>All payments are secure and encrypted</span>
+                      <span className={`${isDesktop ? 'text-[15px]' : 'text-[14px]'} leading-5 font-normal text-[#71717a]`}>Secure and encrypted</span>
                     </div>
                   </div>
-                  <p className={`${isDesktop ? 'text-[15px]' : 'text-[14px]'} leading-5 font-normal text-[#71717a]`}>You'll be redirected to PayPal to complete your payment securely.</p>
                   <button
                     onClick={handlePayPal}
                     disabled={isPayLoading}
-                    className={`w-full ${isDesktop ? 'h-[52px]' : 'h-11'} ${isDesktop ? 'text-[15px]' : 'text-[14px]'} rounded-[6px] bg-[#003087] leading-5 font-medium text-white px-8 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#002069] transition-all flex items-center justify-center`}
+                    className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ height: 48, padding: 0, background: 'transparent', border: 'none', display: 'flex' }}
                   >
-                    {isPayLoading ? <Spinner size={18} color="white" /> : 'Continue with PayPal'}
+                    <div style={{ width: '100%', height: 48, borderRadius: 6, overflow: 'hidden', background: '#1070C4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {isPayLoading
+                        ? <Spinner size={18} color="white" />
+                        : <span style={{ color: 'white', fontSize: 16, fontWeight: 700, fontStyle: 'italic', letterSpacing: 0.2 }}>PayPal</span>
+                      }
+                    </div>
                   </button>
-                  <p className={`${isDesktop ? 'text-[11px]' : 'text-[10px]'} leading-4 font-normal text-[#71717a] text-center w-full`}>
-                    By clicking "Continue" you agree to Appcharge's{' '}
-                    <a href="#" className="underline text-[#71717a]">EULA</a>{' '}and{' '}
-                    <a href="#" className="underline text-[#71717a]">Privacy Policy</a>
-                  </p>
                 </motion.div>
               )}
 
@@ -525,22 +500,22 @@ export function DesktopCheckoutScreen({
                     <span className={`${isDesktop ? 'text-[17px]' : 'text-[16px]'} leading-6 font-semibold text-[#09090b]`}>Pay with Google Pay</span>
                     <div className="flex items-center gap-1">
                       <ShieldCheck size={18} strokeWidth={1.5} color="#3f3f46" />
-                      <span className={`${isDesktop ? 'text-[15px]' : 'text-[14px]'} leading-5 font-normal text-[#71717a]`}>All payments are secure and encrypted</span>
+                      <span className={`${isDesktop ? 'text-[15px]' : 'text-[14px]'} leading-5 font-normal text-[#71717a]`}>Secure and encrypted</span>
                     </div>
                   </div>
-                  <p className={`${isDesktop ? 'text-[15px]' : 'text-[14px]'} leading-5 font-normal text-[#71717a]`}>Complete your purchase quickly with Google Pay.</p>
                   <button
                     onClick={handleGPay}
                     disabled={isPayLoading}
-                    className={`w-full ${isDesktop ? 'h-[52px]' : 'h-11'} ${isDesktop ? 'text-[15px]' : 'text-[14px]'} rounded-[6px] bg-white border border-[#e4e4e7] leading-5 font-medium text-[#09090b] px-8 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-all flex items-center justify-center`}
+                    className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ height: 48, padding: 0, background: 'transparent', border: 'none', display: 'flex' }}
                   >
-                    {isPayLoading ? <Spinner size={18} color="gray" /> : 'Pay with Google Pay'}
+                    <div style={{ width: '100%', height: 48, borderRadius: 6, overflow: 'hidden', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {isPayLoading
+                        ? <Spinner size={18} color="white" />
+                        : <img src={googlePaySrc} alt="Pay with Google Pay" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: 'scale(1.12)' }} draggable={false} />
+                      }
+                    </div>
                   </button>
-                  <p className={`${isDesktop ? 'text-[11px]' : 'text-[10px]'} leading-4 font-normal text-[#71717a] text-center w-full`}>
-                    By clicking "Pay" you agree to Appcharge's{' '}
-                    <a href="#" className="underline text-[#71717a]">EULA</a>{' '}and{' '}
-                    <a href="#" className="underline text-[#71717a]">Privacy Policy</a>
-                  </p>
                 </motion.div>
               )}
 
@@ -602,7 +577,7 @@ export function DesktopCheckoutScreen({
                       <span className="text-[17px] leading-6 font-semibold text-[#09090b]">Pay with debit or credit card</span>
                       <div className="flex items-center gap-1">
                         <ShieldCheck size={18} strokeWidth={1.5} color="#3f3f46" className="flex-shrink-0" />
-                        <span className="text-[15px] leading-5 font-normal text-[#71717a]">All payments are secure and encrypted</span>
+                        <span className="text-[15px] leading-5 font-normal text-[#71717a]">Secure and encrypted</span>
                       </div>
                     </div>
 

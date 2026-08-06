@@ -37,6 +37,33 @@ function loadCurrentConfig(): PlaygroundConfig | null {
   } catch { return null }
 }
 
+function stripBlobUrls(config: PlaygroundConfig): PlaygroundConfig {
+  // blob: URLs are ephemeral — replace with bundled defaults so they survive reload.
+  // data: URLs (base64 from FileReader) are safe to persist as-is.
+  const isBlob = (s: unknown) => typeof s === 'string' && s.startsWith('blob:')
+  return {
+    ...config,
+    products: {
+      ...config.products,
+      gameLogo: isBlob(config.products.gameLogo) ? DEFAULT_CONFIG.products.gameLogo : config.products.gameLogo,
+      items: config.products.items.map((item, i) => ({
+        ...item,
+        icon: isBlob(item.icon) ? (DEFAULT_CONFIG.products.items[i]?.icon ?? item.icon) : item.icon,
+      })),
+    },
+    background: {
+      ...config.background,
+      imageUrl: isBlob(config.background.imageUrl) ? DEFAULT_CONFIG.background.imageUrl : config.background.imageUrl,
+      offerImages: (config.background.offerImages ?? [null, null, null]).map(
+        (url, i) => isBlob(url) || url === null
+          ? (DEFAULT_CONFIG.background.offerImages?.[i] ?? null)
+          : url
+      ) as [string | null, string | null, string | null],
+    },
+  }
+}
+
+
 function relativeTime(ts: number): string {
   const s = Math.floor((Date.now() - ts) / 1000)
   if (s < 60)  return 'just now'
@@ -73,13 +100,14 @@ export function PlaygroundApp() {
   const [showHistory, setShowHistory] = useState(false)
   const [showSaveInput, setShowSaveInput] = useState(false)
   const [saveName, setSaveName]       = useState('')
+  const [configTab, setConfigTab]     = useState<'config' | 'multi-offers'>('config')
 
   const historyRef  = useRef<HTMLDivElement>(null)
   const saveInputRef = useRef<HTMLInputElement>(null)
 
   // Auto-persist current config
   useEffect(() => {
-    localStorage.setItem(CURRENT_KEY, JSON.stringify(config))
+    localStorage.setItem(CURRENT_KEY, JSON.stringify(stripBlobUrls(config)))
   }, [config])
 
   // Close history dropdown on outside click
@@ -437,15 +465,15 @@ export function PlaygroundApp() {
       >
         {/* Left sidebar */}
         <div style={{ width: 318, flexShrink: 0, height: '100%', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,.08)' }}>
-          <ConfigPanel config={config} onChange={setConfig} />
+          <ConfigPanel config={config} onChange={setConfig} activeTab={configTab} onTabChange={setConfigTab} />
         </div>
 
         {/* Center canvas */}
         <div
-          className="flex-1 overflow-auto scrollbar-hide"
+          className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide"
           style={{ borderRadius: 12, background: '#e8e8ea', minWidth: 0, position: 'relative' }}
         >
-          <div style={{ minHeight: '100%', minWidth: 'max-content', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
+          <div style={{ minHeight: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={`${previewKey}-${orientation}`}
@@ -454,7 +482,7 @@ export function PlaygroundApp() {
                 exit={{ opacity: 0, scale: 0.97 }}
                 transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
               >
-                <CheckoutPreviewWrapper key={previewKey} config={config} orientation={orientation} />
+                <CheckoutPreviewWrapper key={`${previewKey}-${configTab}`} config={config} orientation={orientation} isMultiOffers={configTab === 'multi-offers'} />
               </motion.div>
             </AnimatePresence>
           </div>
@@ -462,7 +490,7 @@ export function PlaygroundApp() {
 
         {/* Right — Assets panel */}
         <div style={{ width: 320, flexShrink: 0, height: '100%' }}>
-          <AssetsPanel config={config} onChange={setConfig} />
+          <AssetsPanel config={config} onChange={setConfig} mode={configTab} />
         </div>
       </div>
     </div>

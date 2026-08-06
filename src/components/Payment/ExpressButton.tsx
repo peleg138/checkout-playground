@@ -28,13 +28,13 @@ export function ApplePayButton({ onClick, type = 'apple', compact = false }: Exp
           onClick={onClick}
           className="w-full"
           aria-label={label}
-          style={{ height: 44, padding: 0, background: 'transparent', border: 'none', display: 'flex' }}
+          style={{ height: 48, padding: 0, background: 'transparent', border: 'none', display: 'flex' }}
         >
-          <div style={{ width: '100%', height: 44, borderRadius: 8, overflow: 'hidden', flexShrink: 0, background: bg }}>
-            <img src={src} alt={label} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} draggable={false} />
+          <div style={{ width: '100%', height: 48, borderRadius: 6, overflow: 'hidden', flexShrink: 0, background: bg }}>
+            <img src={src} alt={label} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: 'scale(1.12)' }} draggable={false} />
           </div>
         </button>
-        <div className="flex items-center gap-2 px-1 py-2">
+        <div className="flex items-center gap-2 px-1 pt-4 pb-2">
           <div className="flex-1 h-0 border-t border-[#e4e4e7]" />
           <span className="text-[14px] leading-none font-normal text-[#71717a] whitespace-nowrap">
             Or pay another way
@@ -46,24 +46,25 @@ export function ApplePayButton({ onClick, type = 'apple', compact = false }: Exp
   }
 
   return (
-    <div className="px-4 pt-4 pb-4 flex flex-col gap-4">
-      <button
-        onClick={onClick}
-        className="w-full"
-        aria-label={label}
-        style={{ height: 44, padding: 0, background: 'transparent', border: 'none', display: 'flex' }}
-      >
-        <div style={{ width: '100%', height: 44, borderRadius: 8, overflow: 'hidden', flexShrink: 0, background: bg }}>
-          <img src={src} alt={label} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} draggable={false} />
+    <div className="flex flex-col">
+      <div className="px-4 pt-4 pb-4 flex flex-col gap-4">
+        <button
+          onClick={onClick}
+          className="w-full"
+          aria-label={label}
+          style={{ height: 48, padding: 0, background: 'transparent', border: 'none', display: 'flex' }}
+        >
+          <div style={{ width: '100%', height: 48, borderRadius: 6, overflow: 'hidden', flexShrink: 0, background: bg }}>
+            <img src={src} alt={label} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', transform: 'scale(1.12)' }} draggable={false} />
+          </div>
+        </button>
+        <div className="flex items-center gap-2">
+          <div className="flex-1 h-0 border-t border-[#e4e4e7]" />
+          <span className="text-[14px] leading-5 font-normal text-[#71717a] whitespace-nowrap">
+            Or pay another way
+          </span>
+          <div className="flex-1 h-0 border-t border-[#e4e4e7]" />
         </div>
-      </button>
-
-      <div className="flex items-center gap-2">
-        <div className="flex-1 h-0 border-t border-[#e4e4e7]" />
-        <span className="text-[14px] leading-5 font-normal text-[#71717a] whitespace-nowrap">
-          Or pay another way
-        </span>
-        <div className="flex-1 h-0 border-t border-[#e4e4e7]" />
       </div>
     </div>
   )

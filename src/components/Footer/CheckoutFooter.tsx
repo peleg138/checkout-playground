@@ -9,7 +9,7 @@ interface CheckoutFooterProps {
 export function CheckoutFooter({ className = '', style }: CheckoutFooterProps) {
   return (
     <div className={`bg-white ${className}`} style={style}>
-      <img src={footerSrc} alt="Footer" className="w-full block" draggable={false} style={{ transform: 'scale(1.18)', transformOrigin: 'center center' }} />
+      <img src={footerSrc} alt="Footer" className="w-full block" draggable={false} />
     </div>
   )
 }

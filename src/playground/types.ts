@@ -2,6 +2,8 @@ export interface AppearanceConfig {
   primaryColor: string
   buttonRadius: number
   inputRadius: number
+  showGameName: boolean
+  showCoupon: boolean
 }
 
 export interface BackgroundConfig {
@@ -12,6 +14,7 @@ export interface BackgroundConfig {
   overlay: number
   position: 'center' | 'top' | 'bottom'
   fit: 'cover' | 'contain'
+  offerImages?: [string | null, string | null, string | null]
 }
 
 export interface ProductItem {
@@ -19,6 +22,19 @@ export interface ProductItem {
   name: string
   quantity: string
   icon: string
+}
+
+export interface MultiOfferSubItem {
+  name: string
+  qty: string
+}
+
+export interface MultiOffer {
+  id: string
+  title: string
+  price: string
+  qty: number
+  items: MultiOfferSubItem[]
 }
 
 export interface ProductsConfig {
@@ -30,6 +46,8 @@ export interface ProductsConfig {
   tax: number
   currency: string
   showProductImages: boolean
+  offerCount?: number
+  multiOffers?: MultiOffer[]
 }
 
 export interface PaymentMethodConfig {

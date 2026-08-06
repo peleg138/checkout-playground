@@ -6,6 +6,7 @@ interface InputProps {
   placeholder?: string
   type?: string
   error?: string
+  leftSlot?: React.ReactNode
   rightSlot?: React.ReactNode
   className?: string
   style?: React.CSSProperties
@@ -19,6 +20,7 @@ export function Input({
   placeholder,
   type = 'text',
   error,
+  leftSlot,
   rightSlot,
   className = '',
   style,
@@ -37,6 +39,7 @@ export function Input({
           className,
         ].join(' ')}
       >
+        {leftSlot && <div className="flex-shrink-0 flex items-center mr-1">{leftSlot}</div>}
         <input
           id={id}
           type={type}

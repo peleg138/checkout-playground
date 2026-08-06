@@ -13,6 +13,8 @@ const defaultAppearance: AppearanceConfig = {
   primaryColor: '#448ae3',
   buttonRadius: 6,
   inputRadius: 6,
+  showGameName: true,
+  showCoupon: true,
 }
 
 const defaultBackground: BackgroundConfig = {

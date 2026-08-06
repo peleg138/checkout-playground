@@ -5,6 +5,7 @@ import type { PlaygroundConfig } from '../types'
 interface Props {
   config: PlaygroundConfig
   onChange: (c: PlaygroundConfig) => void
+  mode?: 'config' | 'multi-offers'
 }
 
 /* ─── Shared styles ─────────────────────────────────────────── */
@@ -117,7 +118,9 @@ function UploadRow({ label, value, onUpload, onClear, objectFit = 'contain' }: U
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    onUpload(URL.createObjectURL(file))
+    const reader = new FileReader()
+    reader.onload = ev => { if (ev.target?.result) onUpload(ev.target.result as string) }
+    reader.readAsDataURL(file)
     e.target.value = ''
   }
 
@@ -185,7 +188,8 @@ function UploadRow({ label, value, onUpload, onClear, objectFit = 'contain' }: U
 }
 
 /* ─── Panel ──────────────────────────────────────────────────── */
-export function AssetsPanel({ config, onChange }: Props) {
+export function AssetsPanel({ config, onChange, mode = 'config' }: Props) {
+  const isMultiOffers = mode === 'multi-offers'
   const updateBg = (imageUrl: string | null) =>
     onChange({ ...config, background: { ...config.background, imageUrl } })
 
@@ -217,8 +221,8 @@ export function AssetsPanel({ config, onChange }: Props) {
     >
       {/* Panel header */}
       <div style={{
-        height: 48,
-        padding: '0 16px',
+        height: 'auto',
+        padding: '22px 14px 16px 16px',
         borderBottom: '1px solid #f0f0f5',
         display: 'flex',
         alignItems: 'center',
@@ -252,35 +256,71 @@ export function AssetsPanel({ config, onChange }: Props) {
         {/* ── Background ── */}
         <section>
           <p style={sectionLabel}>Background</p>
-          <UploadRow
-            label="Background Image"
-            value={config.background.imageUrl}
-            onUpload={url => updateBg(url)}
-            onClear={() => updateBg(null)}
-            objectFit="cover"
-          />
+          {isMultiOffers ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <UploadRow
+                label="Background Image"
+                value={config.background.imageUrl}
+                onUpload={url => updateBg(url)}
+                onClear={() => updateBg(null)}
+                objectFit="cover"
+              />
+              <p style={{ ...sectionLabel, marginTop: 20, marginBottom: 2 }}>Offer Images</p>
+              {([0, 1, 2] as const).map((i) => {
+                const offerImages = config.background.offerImages ?? [null, null, null]
+                return (
+                  <UploadRow
+                    key={i}
+                    label={`Offer ${i + 1}`}
+                    value={offerImages[i]}
+                    onUpload={url => {
+                      const next: [string | null, string | null, string | null] = [...offerImages] as [string | null, string | null, string | null]
+                      next[i] = url
+                      onChange({ ...config, background: { ...config.background, offerImages: next } })
+                    }}
+                    onClear={() => {
+                      const next: [string | null, string | null, string | null] = [...offerImages] as [string | null, string | null, string | null]
+                      next[i] = null
+                      onChange({ ...config, background: { ...config.background, offerImages: next } })
+                    }}
+                    objectFit="cover"
+                  />
+                )
+              })}
+            </div>
+          ) : (
+            <UploadRow
+              label="Background Image"
+              value={config.background.imageUrl}
+              onUpload={url => updateBg(url)}
+              onClear={() => updateBg(null)}
+              objectFit="cover"
+            />
+          )}
         </section>
 
-        {/* ── Item Icons ── */}
-        <section>
-          <p style={sectionLabel}>Item Icons</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {config.products.items.map((item, idx) => (
-              <UploadRow
-                key={item.id}
-                label={item.name}
-                value={item.icon || null}
-                onUpload={url => updateItemIcon(idx, url)}
-                onClear={() => clearItemIcon(idx)}
-              />
-            ))}
-            {config.products.items.length === 0 && (
-              <span style={{ fontSize: 12, color: '#a1a1aa', textAlign: 'center', padding: '12px 0' }}>
-                Add items in the Products section
-              </span>
-            )}
-          </div>
-        </section>
+        {/* ── Item Icons (single offer only) ── */}
+        {!isMultiOffers && (
+          <section>
+            <p style={sectionLabel}>Item Icons</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {config.products.items.map((item, idx) => (
+                <UploadRow
+                  key={item.id}
+                  label={item.name}
+                  value={item.icon || null}
+                  onUpload={url => updateItemIcon(idx, url)}
+                  onClear={() => clearItemIcon(idx)}
+                />
+              ))}
+              {config.products.items.length === 0 && (
+                <span style={{ fontSize: 12, color: '#a1a1aa', textAlign: 'center', padding: '12px 0' }}>
+                  Add items in the Products section
+                </span>
+              )}
+            </div>
+          </section>
+        )}
 
       </div>
     </div>

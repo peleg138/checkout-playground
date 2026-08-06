@@ -81,8 +81,12 @@ const initialState: CheckoutState = {
   expressButtonType: 'apple' as const,
 }
 
-export function useCheckoutState(validPromoCodes?: Array<{ code: string; discount: number; label: string }>) {
-  const [state, setState] = useState<CheckoutState>(initialState)
+export function useCheckoutState(
+  validPromoCodes?: Array<{ code: string; discount: number; label: string }>,
+  /** Multi-offers starts collapsed so the offer list is opt-in; single offer stays open. */
+  initialHeaderExpanded = true,
+) {
+  const [state, setState] = useState<CheckoutState>({ ...initialState, headerExpanded: initialHeaderExpanded })
   // Use a ref so applyPromoCode always sees the latest codes without stale closure
   const promoCodesRef = React.useRef(validPromoCodes ?? mockOrder.validPromoCodes)
   promoCodesRef.current = validPromoCodes ?? mockOrder.validPromoCodes

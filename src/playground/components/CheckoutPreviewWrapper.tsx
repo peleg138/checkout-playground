@@ -36,9 +36,10 @@ const DS_RADIUS  = Math.round(12 * DS_SCALE)           // 9
 interface Props {
   config: PlaygroundConfig
   orientation?: 'portrait' | 'landscape' | 'desktop'
+  isMultiOffers?: boolean
 }
 
-export function CheckoutPreviewWrapper({ config, orientation = 'portrait' }: Props) {
+export function CheckoutPreviewWrapper({ config, orientation = 'portrait', isMultiOffers = false }: Props) {
   const {
     state,
     effectiveTotal,
@@ -56,7 +57,7 @@ export function CheckoutPreviewWrapper({ config, orientation = 'portrait' }: Pro
     selectSavedCard,
     submitPayment,
     reset,
-  } = useCheckoutState(config.promo.validCodes)
+  } = useCheckoutState(config.promo.validCodes, !isMultiOffers)
 
   const [visible, setVisible] = useState(true)
 
@@ -131,6 +132,7 @@ export function CheckoutPreviewWrapper({ config, orientation = 'portrait' }: Pro
       state={state}
       effectiveTotal={effectiveTotal}
       enabledPaymentMethods={enabledMethods}
+      isMultiOffers={isMultiOffers}
       onToggleHeader={toggleHeader}
       onClose={handleClose}
       onSetPaymentMethod={setPaymentMethod}
@@ -205,6 +207,7 @@ export function CheckoutPreviewWrapper({ config, orientation = 'portrait' }: Pro
             style={{
               height: innerH,
               overflow: isDesktopLayout ? 'hidden' : 'auto',
+              overflowX: 'hidden',
               overflowY: isDesktopLayout ? 'hidden' : 'auto',
               display: 'flex',
               flexDirection: 'column',

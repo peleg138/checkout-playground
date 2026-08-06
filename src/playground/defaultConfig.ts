@@ -4,6 +4,9 @@ import ITEM_BOOSTER from '../assets/icons/item-booster.png'
 import ITEM_XP from '../assets/icons/item-xp.png'
 import LOGO from '../assets/icons/logo.png'
 import GAME_BG from '../assets/icons/default-background.png'
+import OFFER_1 from '../assets/icons/offer-1-secret-garden.png'
+import OFFER_2 from '../assets/icons/offer-2-magic-castle.png'
+import OFFER_3_STAIRCASE from '../assets/icons/offer-3-staircase.png'
 
 export const DEFAULT_CONFIG: PlaygroundConfig = {
   checkoutMode: {
@@ -30,6 +33,44 @@ export const DEFAULT_CONFIG: PlaygroundConfig = {
     tax: 0,
     currency: '$',
     showProductImages: true,
+    offerCount: 3,
+    multiOffers: [
+      {
+        id: '1',
+        title: 'Secret Garden Starter Bundle',
+        price: '$4.99',
+        qty: 10,
+        items: [
+          { name: 'Garden Trees', qty: '1' },
+          { name: 'Crown', qty: '1' },
+          { name: 'Treasure Chest', qty: '2' },
+          { name: 'Crystals', qty: '50' },
+        ],
+      },
+      {
+        id: '2',
+        title: 'Magic Castle Starter Bundle',
+        price: '$4.99',
+        qty: 2,
+        items: [
+          { name: 'Boosters', qty: '2' },
+          { name: 'Gems', qty: '4' },
+          { name: 'XP (Potion)', qty: '4' },
+        ],
+      },
+      {
+        id: '3',
+        title: 'Fancy Castle VIP \nVIP Bundle',
+        price: '$12.99',
+        qty: 0,
+        items: [
+          { name: 'Treasure Chest', qty: '1' },
+          { name: 'Blue Crystal', qty: '1' },
+          { name: 'Coins', qty: '300' },
+          { name: 'Boosters', qty: '50' },
+        ],
+      },
+    ],
   },
   promo: {
     enabled: true,
@@ -47,10 +88,13 @@ export const DEFAULT_CONFIG: PlaygroundConfig = {
     overlay: 38,
     position: 'center',
     fit: 'cover',
+    offerImages: [OFFER_1, OFFER_2, OFFER_3_STAIRCASE],
   },
   appearance: {
     primaryColor: '#448ae3',
     buttonRadius: 6,
     inputRadius: 6,
+    showGameName: false,
+    showCoupon: true,
   },
 }

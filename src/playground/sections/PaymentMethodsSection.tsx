@@ -213,11 +213,18 @@ export function PaymentMethodsSection({ methods, onChange, checkoutMode, onCheck
                 <DragHandle />
               </span>
 
-              <div style={{ flex: 1 }}>
-                <ControlRow label={METHOD_LABELS[method.id] ?? method.id}>
-                  <Toggle checked={method.enabled} onCheckedChange={() => toggle(method.id)} />
-                </ControlRow>
-              </div>
+              {(() => {
+                const isGpayLocked = method.id === 'gpay' && checkoutMode.hasExpressMethods && checkoutMode.expressButtonType === 'google'
+                const isPaypalLocked = method.id === 'paypal' && checkoutMode.hasExpressMethods && checkoutMode.expressButtonType === 'paypal'
+                const isLocked = isGpayLocked || isPaypalLocked
+                return (
+                  <div style={{ flex: 1, opacity: isLocked ? 0.4 : 1 }}>
+                    <ControlRow label={METHOD_LABELS[method.id] ?? method.id}>
+                      <Toggle checked={isLocked ? false : method.enabled} onCheckedChange={() => !isLocked && toggle(method.id)} />
+                    </ControlRow>
+                  </div>
+                )
+              })()}
             </div>
           )
         })}

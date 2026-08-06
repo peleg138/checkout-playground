@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { PAYMENT_METHODS, type PaymentMethodOption } from './paymentMethodsData'
 import circleCheck from '../../assets/icons/circle-check.png'
@@ -130,21 +130,47 @@ export function OtherPaymentSheet({
             </div>
 
             {/* List — fills remaining height, scrolls internally */}
-            <div className="flex-1 overflow-y-auto px-4 pb-6">
-              <div className="flex flex-col gap-2">
-                {PAYMENT_METHODS.map((method) => (
-                  <PaymentMethodRow
-                    key={method.id}
-                    method={method}
-                    isSelected={selectedMethod === method.id}
-                    onSelect={() => onSelect(method.id)}
-                  />
-                ))}
-              </div>
-            </div>
+            <ScrollListArea
+              selectedMethod={selectedMethod}
+              onSelect={onSelect}
+            />
           </motion.div>
         </div>
       )}
     </AnimatePresence>
+  )
+}
+
+function ScrollListArea({ selectedMethod, onSelect }: { selectedMethod: string; onSelect: (id: string) => void }) {
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const [scrolled, setScrolled] = useState(false)
+
+  return (
+    <div className="flex-1 min-h-0 relative">
+      <div
+        className="absolute top-0 left-0 right-0 h-8 pointer-events-none z-10 transition-opacity duration-200"
+        style={{
+          background: 'linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%)',
+          opacity: scrolled ? 1 : 0,
+        }}
+      />
+      <div
+        ref={scrollRef}
+        className="h-full overflow-y-auto scrollbar-hide px-4 pb-6"
+        style={{ scrollBehavior: 'smooth' }}
+        onScroll={e => setScrolled((e.currentTarget.scrollTop) > 4)}
+      >
+        <div className="flex flex-col gap-2">
+          {PAYMENT_METHODS.map((method) => (
+            <PaymentMethodRow
+              key={method.id}
+              method={method}
+              isSelected={selectedMethod === method.id}
+              onSelect={() => onSelect(method.id)}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
   )
 }

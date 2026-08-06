@@ -61,17 +61,12 @@ export function OtherPayments({
 
   return (
     <div className="px-4 pt-4 pb-4 flex flex-col gap-3">
-      {/* Section header */}
-      <div className="flex flex-col gap-1">
-        <span className="text-[16px] leading-6 font-semibold text-[#09090b]">
-          More Payment Options
+      {/* Secure and encrypted */}
+      <div className="flex items-center gap-1">
+        <ShieldCheck size={18} strokeWidth={1.5} color="#3f3f46" className="flex-shrink-0" />
+        <span className="text-[14px] leading-5 font-normal text-[#71717a]">
+          Secure and encrypted
         </span>
-        <div className="flex items-center gap-1">
-          <ShieldCheck size={18} strokeWidth={1.5} color="#3f3f46" className="flex-shrink-0" />
-          <span className="text-[14px] leading-5 font-normal text-[#71717a]">
-            All payments are secure and encrypted
-          </span>
-        </div>
       </div>
 
       {/* Combobox + dropdown — wrapper is the positioning anchor */}
@@ -153,12 +148,6 @@ export function OtherPayments({
       {!isSheetOpen && (
         <div className="flex flex-col gap-3">
           <Input
-            type="email"
-            placeholder="Email Address"
-            value={form.email}
-            onChange={v => onChange('email', v)}
-          />
-          <Input
             type="text"
             placeholder="Billing Address"
             value={form.address}
@@ -182,6 +171,20 @@ export function OtherPayments({
               />
             </div>
           </div>
+          <div className="pb-1">
+            <Input
+              type="email"
+              placeholder="Email Address"
+              value={form.email}
+              onChange={v => onChange('email', v)}
+              leftSlot={
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="flex-shrink-0">
+                  <rect x="1.5" y="3.5" width="13" height="9" rx="1.5" stroke="#9ca3af" strokeWidth="1.2"/>
+                  <path d="M1.5 5l6.5 4 6.5-4" stroke="#9ca3af" strokeWidth="1.2" strokeLinecap="round"/>
+                </svg>
+              }
+            />
+          </div>
         </div>
       )}
 
@@ -191,7 +194,7 @@ export function OtherPayments({
           <button
             onClick={onPay}
             disabled={isPayLoading}
-            className="w-full h-11 rounded-[6px] bg-[#448ae3] text-[14px] leading-5 font-medium text-white px-8 py-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#3a7bd0] active:bg-[#3370c0] transition-all flex items-center justify-center"
+            className="w-full h-12 rounded-[6px] bg-[#448ae3] text-[16px] leading-5 font-normal text-white px-8 py-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#3a7bd0] active:bg-[#3370c0] transition-all flex items-center justify-center"
           >
             {isPayLoading ? <Spinner size={18} color="white" /> : `Pay $${effectiveTotal.toFixed(2)}`}
           </button>

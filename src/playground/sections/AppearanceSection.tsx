@@ -35,60 +35,10 @@ export function AppearanceSection({ config, onChange, background, onBackgroundCh
   return (
     <ConfigSection title="Appearance" icon={<Palette size={15} />} isOpen={isOpen} onToggle={onToggle}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <ControlRow label="Primary Color">
-          <ColorPicker
-            value={config.primaryColor}
-            onChange={v => onChange({ ...config, primaryColor: v })}
-            onSavePreset={savePreset}
-          />
+        <ControlRow label="Coupon">
+          <Toggle checked={config.showCoupon ?? true} onCheckedChange={v => onChange({ ...config, showCoupon: v })} />
         </ControlRow>
-
-        {/* Color presets */}
-        <div style={{ height: 1, background: '#e4e4e7', marginTop: 4 }} />
-        <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: '#a1a1aa', marginTop: 4 }}>
-          Presets
-        </span>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7, marginBottom: 4 }}>
-          {DEFAULT_PRESETS.map(color => (
-            <button
-              key={color}
-              onClick={() => onChange({ ...config, primaryColor: color })}
-              title={color}
-              style={{
-                width: 20,
-                height: 20,
-                borderRadius: '50%',
-                background: color,
-                border: config.primaryColor.toLowerCase() === color.toLowerCase() ? '2.5px solid #18181b' : '2.5px solid transparent',
-                cursor: 'pointer',
-                padding: 0,
-                transition: 'transform .12s',
-                transform: config.primaryColor.toLowerCase() === color.toLowerCase() ? 'scale(1.15)' : 'scale(1)',
-              }}
-            />
-          ))}
-          {userPresets.map(color => (
-            <button
-              key={color}
-              onClick={() => onChange({ ...config, primaryColor: color })}
-              title={color}
-              style={{
-                width: 20,
-                height: 20,
-                borderRadius: '50%',
-                background: color,
-                border: config.primaryColor.toLowerCase() === color.toLowerCase() ? '2.5px solid #18181b' : '2.5px solid transparent',
-                cursor: 'pointer',
-                padding: 0,
-                transition: 'transform .12s',
-                transform: config.primaryColor.toLowerCase() === color.toLowerCase() ? 'scale(1.15)' : 'scale(1)',
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Divider */}
-        <div style={{ height: 1, background: '#e4e4e7' }} />
+        <div style={{ height: 1, background: '#e4e4e7', margin: '4px 0' }} />
 
         {/* Background type toggle */}
         <ControlRow label="Background">
