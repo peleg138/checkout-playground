@@ -133,13 +133,10 @@ export function CheckoutHeader({
 
       {/* Content layer */}
       <div className="relative">
-        {/* Row 1: logo + game name + close */}
+        {/* Row 1: logo + close */}
         <div className="flex items-center gap-2 pt-3 pb-4">
           <img src={gameLogo} alt={products.gameName || 'Game'} className="w-11 h-11 rounded-[4.4px] flex-shrink-0 object-cover" draggable={false} />
-          {(appearance.showGameName ?? true)
-            ? <span className={`text-[16px] leading-6 font-semibold flex-1 ${titleColor}`}>{products.gameName || 'Royal Blast'}</span>
-            : <span className="flex-1" />
-          }
+          <span className="flex-1" />
           <button
             onClick={onClose}
             className="flex items-center justify-center"
