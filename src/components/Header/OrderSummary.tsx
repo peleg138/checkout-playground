@@ -8,6 +8,7 @@ import promoDeskSrc1 from '../../assets/icons/promo-desk-1.png'
 import banner1Src from '../../assets/icons/banner-1.png'
 import { useAppearance } from '../../playground/AppearanceContext'
 import { useScrollFade } from '../../hooks/useScrollFade'
+import { multiOfferPricing } from '../../utils/multiOfferPricing'
 
 function TagIcon({ stroke, size = 16 }: { stroke?: string; size?: number }) {
   return (
@@ -152,6 +153,11 @@ export function OrderSummary({
     subtotal: products.subtotal ?? mockOrder.pricing.subtotal,
     tax: products.tax ?? mockOrder.pricing.tax,
   }
+  // Multi-offer summary is driven by the offer prices, not the single-offer subtotal.
+  const multiPricing = multiOfferPricing(products.multiOffers, pricing.tax, promoDiscount)
+  const displaySubtotal = isMultiOffers ? multiPricing.subtotal : pricing.subtotal
+  const displayTax = isMultiOffers ? multiPricing.taxAmount : 0
+  const displayTotal = isMultiOffers ? multiPricing.total : effectiveTotal
 
   const textPrimary = hasBg ? 'text-white' : 'text-[#09090b]'
   const textSecondary = hasBg ? 'text-white/80' : 'text-black'
@@ -248,7 +254,7 @@ export function OrderSummary({
       <div className={`flex flex-col ${showPromoImages && !isDesktop ? 'gap-0.5' : 'gap-2'}`}>
         <div className={`${isDesktop ? 'text-[16px] leading-6' : 'text-[14px] leading-5'} font-normal ${textSecondary} flex justify-between`}>
           <span>Subtotal</span>
-          <span>{pricing.currency}{pricing.subtotal.toFixed(2)}</span>
+          <span>{pricing.currency}{displaySubtotal.toFixed(2)}</span>
         </div>
         {promoStatus === 'success' && promoDiscount > 0 && (
           <div className={`${isDesktop ? 'text-[16px] leading-6' : 'text-[14px] leading-5'} font-normal ${textSecondary} flex justify-between`}>
@@ -258,11 +264,11 @@ export function OrderSummary({
         )}
         <div className={`${isDesktop ? 'text-[16px] leading-6' : 'text-[14px] leading-5'} font-normal ${textSecondary} flex justify-between`}>
           <span>Tax ({pricing.tax}%)</span>
-          <span>{pricing.currency}0.00</span>
+          <span>{pricing.currency}{displayTax.toFixed(2)}</span>
         </div>
         <div className={`${isDesktop ? 'text-[18px] leading-7' : 'text-[16px] leading-6'} font-bold ${textSecondary} flex justify-between h-8 items-start -mx-4 px-4`}>
           <span>Total</span>
-          <span>{pricing.currency}{effectiveTotal.toFixed(2)}</span>
+          <span>{pricing.currency}{displayTotal.toFixed(2)}</span>
         </div>
       </div>
     </div>

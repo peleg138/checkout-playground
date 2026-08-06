@@ -9,6 +9,7 @@ import containerSrc from '../../assets/icons/Container.png'
 import genericHeaderSrc from '../../assets/icons/GenericHeader.png'
 import { useAppearance } from '../../playground/AppearanceContext'
 import { useScrollFade } from '../../hooks/useScrollFade'
+import { multiOfferPricing } from '../../utils/multiOfferPricing'
 import type { MultiOffer } from '../../playground/types'
 
 const MAX_TITLE_CHARS = 22
@@ -95,6 +96,8 @@ export function CheckoutHeader({
     subtotal: products.subtotal ?? mockPricing.subtotal,
     tax: products.tax ?? mockPricing.tax,
   }
+  // Multi-offer summary is driven by the offer prices, not the single-offer subtotal.
+  const multiPricing = multiOfferPricing(products.multiOffers, pricing.tax, promoDiscount)
   const offerCount = products.offerCount ?? 3
   const extraOffers = offerCount > 3 ? offerCount - 3 : 0
   const offerTitle = products.offerTitle || offer.title
@@ -280,17 +283,17 @@ export function CheckoutHeader({
               <>
                 <div className="flex justify-between">
                   <span className={`text-[14px] leading-5 font-normal ${titleColor}`}>Subtotal</span>
-                  <span className={`text-[14px] leading-5 font-normal ${titleColor}`}>{pricing.currency}{pricing.subtotal.toFixed(2)}</span>
+                  <span className={`text-[14px] leading-5 font-normal ${titleColor}`}>{pricing.currency}{multiPricing.subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className={`text-[14px] leading-5 font-normal ${titleColor}`}>Tax ({pricing.tax}%)</span>
-                  <span className={`text-[14px] leading-5 font-normal ${titleColor}`}>{pricing.currency}0.00</span>
+                  <span className={`text-[14px] leading-5 font-normal ${titleColor}`}>{pricing.currency}{multiPricing.taxAmount.toFixed(2)}</span>
                 </div>
               </>
             )}
             <div className="flex items-baseline justify-between">
               <span className={`text-[16px] leading-6 font-bold ${titleColor}`}>Total</span>
-              <span className={`text-[17px] leading-6 font-bold ${titleColor}`}>{pricing.currency}{effectiveTotal.toFixed(2)}</span>
+              <span className={`text-[17px] leading-6 font-bold ${titleColor}`}>{pricing.currency}{(isMultiOffers ? multiPricing.total : effectiveTotal).toFixed(2)}</span>
             </div>
           </div>
         )}
