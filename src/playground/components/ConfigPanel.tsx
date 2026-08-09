@@ -30,7 +30,7 @@ export function ConfigPanel({ config, onChange, activeTab, onTabChange }: Props)
         flexShrink: 0,
         gap: 2,
       }}>
-        {(['config', 'multi-offers'] as PanelTab[]).map(tab => (
+        {(['config', 'multi-offers'] as Props['activeTab'][]).map(tab => (
           <button
             key={tab}
             onClick={() => onTabChange(tab)}
@@ -104,6 +104,22 @@ export function ConfigPanel({ config, onChange, activeTab, onTabChange }: Props)
             isOpen={openSection === 'products'}
             onToggle={() => toggle('products')}
             isMultiOffers
+            onRemoveOffer={idx => {
+              const offers = config.products.multiOffers ?? []
+              onChange({
+                ...config,
+                products: {
+                  ...config.products,
+                  multiOffers: offers.filter((_, i) => i !== idx),
+                  offerCount: Math.max(1, (config.products.offerCount ?? offers.length) - 1),
+                },
+                // Offer images are index-aligned with multiOffers, so drop the matching slot.
+                background: {
+                  ...config.background,
+                  offerImages: (config.background.offerImages ?? []).filter((_, i) => i !== idx),
+                },
+              })
+            }}
           />
           <AppearanceSection
             config={config.appearance}

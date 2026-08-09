@@ -266,23 +266,22 @@ export function AssetsPanel({ config, onChange, mode = 'config' }: Props) {
                 objectFit="cover"
               />
               <p style={{ ...sectionLabel, marginTop: 20, marginBottom: 2 }}>Offer Images</p>
-              {([0, 1, 2] as const).map((i) => {
-                const offerImages = config.background.offerImages ?? [null, null, null]
+              {/* One slot per configured offer, so adding an offer adds its upload row. */}
+              {(config.products.multiOffers ?? []).map((offer, i) => {
+                const offerImages = config.background.offerImages ?? []
+                const setImage = (url: string | null) => {
+                  const next = [...offerImages]
+                  while (next.length <= i) next.push(null)
+                  next[i] = url
+                  onChange({ ...config, background: { ...config.background, offerImages: next } })
+                }
                 return (
                   <UploadRow
-                    key={i}
+                    key={offer.id ?? i}
                     label={`Offer ${i + 1}`}
-                    value={offerImages[i]}
-                    onUpload={url => {
-                      const next: [string | null, string | null, string | null] = [...offerImages] as [string | null, string | null, string | null]
-                      next[i] = url
-                      onChange({ ...config, background: { ...config.background, offerImages: next } })
-                    }}
-                    onClear={() => {
-                      const next: [string | null, string | null, string | null] = [...offerImages] as [string | null, string | null, string | null]
-                      next[i] = null
-                      onChange({ ...config, background: { ...config.background, offerImages: next } })
-                    }}
+                    value={offerImages[i] ?? null}
+                    onUpload={url => setImage(url)}
+                    onClear={() => setImage(null)}
                     objectFit="cover"
                   />
                 )

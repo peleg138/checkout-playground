@@ -9,6 +9,12 @@ interface Props {
   isOpen?: boolean
   onToggle?: () => void
   isMultiOffers?: boolean
+  /**
+   * Removes an offer *and* its image slot in one update. Doing both here rather than
+   * with two callbacks matters: two sequential onChange calls both derive from the same
+   * config snapshot, so the second would clobber the first.
+   */
+  onRemoveOffer?: (idx: number) => void
 }
 
 const inputStyle: React.CSSProperties = {
@@ -170,7 +176,7 @@ function MultiOfferEditor({ offer, idx, onChange, onRemove }: {
   )
 }
 
-export function ProductsSection({ config, onChange, isOpen, onToggle, isMultiOffers = false }: Props) {
+export function ProductsSection({ config, onChange, isOpen, onToggle, isMultiOffers = false, onRemoveOffer }: Props) {
   const updateItem = (idx: number, field: keyof ProductItem, value: string) => {
     const items = config.items.map((item, i) => i === idx ? { ...item, [field]: value } : item)
     onChange({ ...config, items })
@@ -193,6 +199,10 @@ export function ProductsSection({ config, onChange, isOpen, onToggle, isMultiOff
   }
 
   const removeMultiOffer = (idx: number) => {
+    if (onRemoveOffer) {
+      onRemoveOffer(idx)
+      return
+    }
     onChange({ ...config, multiOffers: multiOffers.filter((_, i) => i !== idx), offerCount: Math.max(1, (config.offerCount ?? multiOffers.length) - 1) })
   }
 

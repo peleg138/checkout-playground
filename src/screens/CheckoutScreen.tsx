@@ -164,8 +164,8 @@ export function CheckoutScreen({
                     </button>
                   </div>
                   <PromoInput
-                    promoCode={promoCode}
-                    promoStatus={promoStatus}
+                    promoCode={state.promoCode}
+                    promoStatus={state.promoStatus}
                     primaryColor={appearance.primaryColor}
                     placeholder="Coupon"
                     onPromoChange={onPromoChange}

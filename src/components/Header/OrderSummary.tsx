@@ -160,7 +160,8 @@ export function OrderSummary({
   const displayTotal = isMultiOffers ? multiPricing.total : effectiveTotal
 
   const textPrimary = hasBg ? 'text-white' : 'text-[#09090b]'
-  const textSecondary = hasBg ? 'text-white/80' : 'text-black'
+  // Pricing rows read at full white over a background image — 80% was muddy against the art.
+  const textSecondary = hasBg ? 'text-white' : 'text-black'
   const dividerColor = hasBg ? 'border-white/20' : 'border-[#e4e4e7]'
   // Shorter than the default: rows here are 51px tall, so a long fade washes out a whole item.
   // Tuned per layout — a fade that reads well in desktop's 154px window covers too much of a
@@ -168,8 +169,9 @@ export function OrderSummary({
   const itemsFadePx = isDesktop ? 10 : isLandscape ? 5 : 6
   const itemsFade = useScrollFade([items, isDesktop, isLandscape, showPromoImages], itemsFadePx)
 
+  // Landscape sits tight under the offer panel; portrait keeps the roomier pt-3.
   return (
-    <div className={`flex flex-col gap-4 pb-0 ${paddingClass} ${isMultiOffers ? 'pt-3' : ''}`}>
+    <div className={`flex flex-col gap-4 pb-0 ${paddingClass} ${isMultiOffers ? (isLandscape ? 'pt-1' : 'pt-3') : ''}`}>
       {/* Items */}
       {/* Panel tint lives on the wrapper so the fade masks only the rows, not the panel edge */}
       {!isMultiOffers && <div className={`${hasBg ? 'bg-black/10' : 'bg-[#f4f4f5]'} rounded-[7px]`}><div

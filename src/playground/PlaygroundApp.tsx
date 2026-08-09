@@ -470,10 +470,12 @@ export function PlaygroundApp() {
 
         {/* Center canvas */}
         <div
-          className="flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide"
+          className="flex-1 overflow-auto scrollbar-hide"
           style={{ borderRadius: 12, background: '#e8e8ea', minWidth: 0, position: 'relative' }}
         >
-          <div style={{ minHeight: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
+          {/* `margin: auto` rather than justify/align-center: centering alone would clip the
+              overflowing edges of the wider landscape/desktop frames out of scroll reach. */}
+          <div style={{ minHeight: '100%', display: 'flex', padding: '40px', width: 'fit-content', minWidth: '100%' }}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={`${previewKey}-${orientation}`}
@@ -481,6 +483,7 @@ export function PlaygroundApp() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.97 }}
                 transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                style={{ margin: 'auto' }}
               >
                 <CheckoutPreviewWrapper key={`${previewKey}-${configTab}`} config={config} orientation={orientation} isMultiOffers={configTab === 'multi-offers'} />
               </motion.div>

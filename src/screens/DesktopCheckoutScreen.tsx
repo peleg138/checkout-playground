@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, ShieldCheck, ArrowLeft } from 'lucide-react'
 import { OrderSummary } from '../components/Header/OrderSummary'
+import { MultiOfferList } from '../components/Header/MultiOfferList'
+import { MultiOfferBox } from '../components/Header/MultiOfferBox'
 import { ApplePayButton } from '../components/Payment/ExpressButton'
 import { APMSTabs } from '../components/Payment/APMSTabs'
 import { CardForm } from '../components/Payment/CardForm'
@@ -19,6 +21,7 @@ import applePaySrc from '../assets/icons/express.png'
 import googlePaySrc from '../assets/icons/express-gpay.png'
 import expressPaypalSrc from '../assets/icons/express-paypal.png'
 import logoSrc from '../assets/icons/logo.png'
+import shoppingCartSrc from '../assets/icons/ShoppingCart.png'
 import desktopFooterSrc from '../assets/icons/footer-desktop.png'
 import landscapeFooterSrc from '../assets/icons/footer-landscape.png'
 import circleCheck from '../assets/icons/circle-check.png'
@@ -30,6 +33,8 @@ interface DesktopCheckoutScreenProps {
   effectiveTotal: number
   enabledPaymentMethods?: string[]
   isDesktop?: boolean
+  isMultiOffers?: boolean
+  onToggleHeader?: () => void
   onClose: () => void
   onSetPaymentMethod: (m: PaymentMethod) => void
   onCardFormChange: (field: keyof CardFormData, value: string | boolean) => void
@@ -51,6 +56,8 @@ export function DesktopCheckoutScreen({
   effectiveTotal,
   enabledPaymentMethods,
   isDesktop = false,
+  isMultiOffers = false,
+  onToggleHeader,
   onClose,
   onSetPaymentMethod,
   onCardFormChange,
@@ -75,6 +82,10 @@ export function DesktopCheckoutScreen({
     paypal: { src: expressPaypalSrc, label: 'Pay with PayPal',     bg: '#FFC439' },
   }
   const hasBg = !!background.imageUrl && background.backgroundType !== 'white'
+  // Desktop mirrors the portrait checkout: the collapsible offers box. Landscape has no
+  // room to collapse, so it shows the bare list instead.
+  const showMultiOfferBox = isMultiOffers && isDesktop
+  const showMultiOfferList = isMultiOffers && !isDesktop
 
   const [isPayLoading, setIsPayLoading] = useState(false)
   const [showOtherMethodPicker, setShowOtherMethodPicker] = useState(false)
@@ -161,25 +172,56 @@ export function DesktopCheckoutScreen({
           {/* Content sits above the background */}
           <div className={`relative ${isDesktop ? 'pt-12' : 'pt-4'}`}>
             {/* Logo + offer title */}
-            <div className="flex items-center gap-2 pb-3">
+            <div className={`flex items-center gap-2 ${showMultiOfferList ? 'pb-1.5' : 'pb-3'}`}>
               <img
                 src={products.gameLogo || logoSrc}
                 alt={products.gameName || 'Game'}
                 className={`${isDesktop ? 'w-[52px] h-[52px]' : 'w-11 h-11'} rounded-[4.4px] flex-shrink-0 object-cover`}
                 draggable={false}
               />
-              <div className="flex items-center gap-2 flex-1">
-                <span className={`${isDesktop ? 'text-[16px]' : 'text-[14px]'} leading-6 font-semibold ${hasBg ? 'text-white' : 'text-black'}`}>
-                  {products.offerTitle || mockOrder.offer.title}
-                </span>
-              </div>
+              {showMultiOfferList ? (
+                /* Landscape multi offers: the offer count replaces the single-offer title, right-aligned. */
+                <div className="flex items-center gap-1.5 flex-1 justify-end">
+                  <img
+                    src={shoppingCartSrc}
+                    alt=""
+                    width={isDesktop ? 18 : 16}
+                    height={isDesktop ? 18 : 16}
+                    draggable={false}
+                    style={{ filter: hasBg ? 'brightness(0) invert(1)' : 'none' }}
+                  />
+                  <span className={`${isDesktop ? 'text-[16px] leading-6' : 'text-[14px] leading-5'} font-semibold ${hasBg ? 'text-white' : 'text-black'}`}>
+                    {products.multiOffers?.length ?? 0} Offers
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 flex-1">
+                  <span className={`${isDesktop ? 'text-[16px]' : 'text-[14px]'} leading-6 font-semibold ${hasBg ? 'text-white' : 'text-black'}`}>
+                    {products.offerTitle || mockOrder.offer.title}
+                  </span>
+                </div>
+              )}
             </div>
+
+            {/* Multi offers: the scroll window is the whole affordance here — there is no
+                collapsed state to expand into, unlike the portrait header. */}
+            {/* No bottom margin on the panel: OrderSummary's own pt-3 separates it from the promo row. */}
+            {showMultiOfferList && (
+              <div style={{ background: hasBg ? 'rgba(0,0,0,0.10)' : '#f4f4f5', borderRadius: 8 }}>
+                <MultiOfferList hasBg={hasBg} maxHeight={112} compact />
+              </div>
+            )}
+
+            {showMultiOfferBox && (
+              <MultiOfferBox expanded={state.headerExpanded} onToggle={onToggleHeader ?? (() => {})} hasBg={hasBg} maxHeight={340} isDesktop />
+            )}
 
             {/* Items + promo + pricing — px-0 so content aligns with the pl-12 wrapper (no double indent) */}
             <OrderSummary
               paddingClass="px-0"
               isDesktop={isDesktop}
               isLandscape={!isDesktop}
+              isMultiOffers={isMultiOffers}
               showPromoImages
               promoCode={state.promoCode}
               promoStatus={state.promoStatus}

@@ -14,7 +14,8 @@ export interface BackgroundConfig {
   overlay: number
   position: 'center' | 'top' | 'bottom'
   fit: 'cover' | 'contain'
-  offerImages?: [string | null, string | null, string | null]
+  /** One entry per offer, index-aligned with products.multiOffers. */
+  offerImages?: (string | null)[]
 }
 
 export interface ProductItem {
