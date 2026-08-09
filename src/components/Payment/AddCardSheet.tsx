@@ -155,11 +155,6 @@ export function AddCardSheet({ isOpen, effectiveTotal, onClose, onAdd }: AddCard
               >
                 Cancel
               </button>
-              <p className="text-[10px] leading-4 font-normal text-[#71717a] text-center w-full">
-                By clicking "Pay" you indicate that you have read, understood and agree to Appcharge's{' '}
-                <a href="#" className="underline text-[#71717a]">EULA</a>{' '}and{' '}
-                <a href="#" className="underline text-[#71717a]">Privacy Policy</a>
-              </p>
             </div>
           </motion.div>
         </div>
