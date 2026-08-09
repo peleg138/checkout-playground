@@ -582,7 +582,6 @@ export function DesktopCheckoutScreen({
                       setShowSavedCardsSheet(true)
                     }}
                     onPay={onSavedCardPay}
-                    showLegal={!isDesktop}
                   />
                 </motion.div>
               )}
