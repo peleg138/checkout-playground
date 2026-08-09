@@ -192,7 +192,12 @@ export function CheckoutPreviewWrapper({ config, orientation = 'portrait', isMul
           flexShrink: 0,
         }}
       >
-        {/* Inner: full internal dimensions, scaled down from top-left */}
+        {/*
+          Inner: full internal dimensions, scaled down from top-left.
+          Its transform also makes it the containing block for the bottom
+          sheets' `position: fixed`, which pins them to the device frame
+          rather than to the scrolling checkout content inside it.
+        */}
         <div
           style={{
             width: innerW,

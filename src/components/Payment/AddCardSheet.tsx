@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useSheetScrollLock } from '../../hooks/useSheetScrollLock'
 import { ShieldCheck } from 'lucide-react'
 import { Input } from '../UI/Input'
 import { Checkbox } from '../UI/Checkbox'
@@ -20,6 +21,9 @@ export function AddCardSheet({ isOpen, effectiveTotal, onClose, onAdd }: AddCard
   const [cvc, setCvc] = useState('')
   const [zip, setZip] = useState('')
   const [saveCard, setSaveCard] = useState(true)
+  const overlayRef = useRef<HTMLDivElement>(null)
+
+  useSheetScrollLock(isOpen, overlayRef)
 
   const brand = detectCardBrand(cardNumber)
 
@@ -47,7 +51,7 @@ export function AddCardSheet({ isOpen, effectiveTotal, onClose, onAdd }: AddCard
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="absolute inset-0 z-[70] pointer-events-none flex flex-col justify-end">
+        <div ref={overlayRef} className="fixed inset-0 z-[70] pointer-events-none flex flex-col justify-end">
           <motion.div
             key="backdrop"
             initial={{ opacity: 0 }}

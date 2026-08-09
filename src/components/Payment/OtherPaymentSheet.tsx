@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { useSheetScrollLock } from '../../hooks/useSheetScrollLock'
 import { PAYMENT_METHODS, type PaymentMethodOption } from './paymentMethodsData'
 import circleCheck from '../../assets/icons/circle-check.png'
 
@@ -86,13 +87,16 @@ export function OtherPaymentSheet({
   onClose,
   onSelect,
 }: OtherPaymentSheetProps) {
+  const overlayRef = useRef<HTMLDivElement>(null)
+
+  useSheetScrollLock(isOpen, overlayRef)
+
   return (
     <AnimatePresence>
       {isOpen && (
         <div
-          className="absolute inset-0 z-[60] pointer-events-none flex flex-col justify-end"
-          onWheel={e => e.stopPropagation()}
-          onTouchMove={e => e.stopPropagation()}
+          ref={overlayRef}
+          className="fixed inset-0 z-[60] pointer-events-none flex flex-col justify-end"
         >
           {/* Backdrop */}
           <motion.div
@@ -103,8 +107,6 @@ export function OtherPaymentSheet({
             transition={{ duration: 0.2 }}
             className="absolute inset-0 bg-black/40 pointer-events-auto"
             onClick={onClose}
-            onWheel={e => e.stopPropagation()}
-            onTouchMove={e => e.stopPropagation()}
           />
 
           {/* Sheet */}

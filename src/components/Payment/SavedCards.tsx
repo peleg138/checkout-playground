@@ -15,6 +15,8 @@ interface SavedCardsProps {
   onSelect: (id: string) => void
   onOpenManageCards: () => void
   onPay: (cvc?: string) => void
+  /** Desktop shows its own footer under the panel, so it opts out of the inline legal line. */
+  showLegal?: boolean
 }
 
 /* ── Brand logos ─────────────────────────────────────────────────── */
@@ -168,6 +170,7 @@ export function SavedCards({
   onSelect,
   onOpenManageCards,
   onPay,
+  showLegal = true,
 }: SavedCardsProps) {
   const [localCards, setLocalCards] = useState(cards)
   const [cvcValue, setCvcValue] = useState('')
@@ -277,11 +280,13 @@ export function SavedCards({
         {isPayLoading ? <Spinner size={18} color="white" /> : `Pay $${effectiveTotal.toFixed(2)}`}
       </button>
 
-      <p className="text-[10px] leading-4 font-normal text-[#71717a] text-center w-full">
-        By clicking "Pay" you indicate that you have read, understood and agree to Appcharge's{' '}
-        <a href="#" className="underline text-[#71717a]">EULA</a>{' '}and{' '}
-        <a href="#" className="underline text-[#71717a]">Privacy Policy</a>
-      </p>
+      {showLegal && (
+        <p className="text-[10px] leading-4 font-normal text-[#71717a] text-center w-full">
+          By clicking "Pay" you indicate that you have read, understood and agree to Appcharge's{' '}
+          <a href="#" className="underline text-[#71717a]">EULA</a>{' '}and{' '}
+          <a href="#" className="underline text-[#71717a]">Privacy Policy</a>
+        </p>
+      )}
     </div>
   )
 }

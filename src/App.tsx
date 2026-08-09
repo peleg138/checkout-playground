@@ -135,6 +135,9 @@ export default function App() {
         Device frame: fixed 375×812px — never scales, never stretches.
         Rounded corners + shadow give it the feel of a real device.
         overflow-hidden ensures the inner content clips to the rounded frame.
+        translateZ(0) makes this the containing block for the bottom sheets'
+        `position: fixed`, pinning them to the frame rather than to the
+        scrolling checkout content inside it.
       */}
       <div
         className="relative flex flex-col bg-white flex-shrink-0"
@@ -143,6 +146,7 @@ export default function App() {
           height: 812,
           borderRadius: 24,
           overflow: 'hidden',
+          transform: 'translateZ(0)',
           boxShadow: '0 32px 80px rgba(0,0,0,0.22), 0 8px 24px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.06)',
         }}
       >

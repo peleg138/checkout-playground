@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
+import { useSheetScrollLock } from '../../hooks/useSheetScrollLock'
 import creditCardSrc from '../../assets/icons/credit-card.png'
 import { AnimatePresence, motion } from 'framer-motion'
 import circleCheckSrc from '../../assets/icons/circle-check.png'
@@ -159,6 +160,9 @@ export function SavedCardsSheet({ isOpen, cards, selectedId, onClose, onSelect, 
   const [localCards, setLocalCards] = useState(cards)
   const [pendingId, setPendingId] = useState<string | null>(selectedId)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const overlayRef = useRef<HTMLDivElement>(null)
+
+  useSheetScrollLock(isOpen, overlayRef)
 
   useEffect(() => {
     if (isOpen) { setLocalCards(cards); setPendingId(selectedId); setOpenMenuId(null) }
@@ -174,7 +178,7 @@ export function SavedCardsSheet({ isOpen, cards, selectedId, onClose, onSelect, 
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="absolute inset-0 z-[60] pointer-events-none flex flex-col justify-end">
+        <div ref={overlayRef} className="fixed inset-0 z-[60] pointer-events-none flex flex-col justify-end">
           <motion.div
             key="backdrop"
             initial={{ opacity: 0 }}
