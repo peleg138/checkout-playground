@@ -85,7 +85,7 @@ export const DEFAULT_CONFIG: PlaygroundConfig = {
     backgroundType: 'image',
     opacity: 100,
     blur: 0,
-    overlay: 38,
+    overlay: 50,
     position: 'center',
     fit: 'cover',
     offerImages: [OFFER_1, OFFER_2, OFFER_3_STAIRCASE],
