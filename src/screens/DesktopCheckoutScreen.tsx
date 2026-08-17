@@ -579,7 +579,7 @@ export function DesktopCheckoutScreen({
                 </motion.div>
               )}
 
-              {state.selectedPaymentMethod === 'card' && state.userMode === 'new' && !isDesktop && (
+              {state.selectedPaymentMethod === 'card' && state.userMode === 'new' && (
                 <motion.div
                   key="card"
                   initial={{ opacity: 0, y: 8 }}
@@ -595,105 +595,6 @@ export function DesktopCheckoutScreen({
                     onChange={onCardFormChange}
                     onSubmit={handleSubmitNewCard}
                   />
-                </motion.div>
-              )}
-
-              {state.selectedPaymentMethod === 'card' && state.userMode === 'new' && isDesktop && (
-                <motion.div
-                  key="card-desktop"
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <div className="px-6 pt-5 pb-4 flex flex-col gap-5">
-                    {/* Header */}
-                    <div className="flex flex-col gap-1">
-                      <span className="text-[17px] leading-6 font-semibold text-[#09090b]">Pay with debit or credit card</span>
-                      <div className="flex items-center gap-1">
-                        <ShieldCheck size={18} strokeWidth={1.5} color="#3f3f46" className="flex-shrink-0" />
-                        <span className="text-[15px] leading-5 font-normal text-[#71717a]">Secure and encrypted</span>
-                      </div>
-                    </div>
-
-                    {/* Fields */}
-                    <div className="flex flex-col gap-3">
-                      <Input
-                        type="email"
-                        placeholder="Email Address"
-                        value={state.cardForm.email}
-                        onChange={v => onCardFormChange('email', v)}
-                        error={state.cardErrors.email}
-                        style={{ height: 48 }}
-                      />
-                      <Input
-                        type="text"
-                        placeholder="Card Number"
-                        value={state.cardForm.cardNumber}
-                        onChange={v => {
-                          const d = v.replace(/\D/g, '').slice(0, 16)
-                          onCardFormChange('cardNumber', d.replace(/(\d{4})(?=\d)/g, '$1 '))
-                        }}
-                        error={state.cardErrors.cardNumber}
-                        style={{ height: 48 }}
-                        rightSlot={
-                          detectCardBrand(state.cardForm.cardNumber) !== 'unknown'
-                            ? <CardBrandIcon brand={detectCardBrand(state.cardForm.cardNumber)} />
-                            : <AllCardIcons />
-                        }
-                      />
-                      <div className="grid grid-cols-2 gap-3">
-                        <Input
-                          type="text"
-                          placeholder="MM/YY"
-                          value={state.cardForm.expiry}
-                          onChange={v => {
-                            const d = v.replace(/\D/g, '').slice(0, 4)
-                            onCardFormChange('expiry', d.length >= 3 ? d.slice(0, 2) + '/' + d.slice(2) : d)
-                          }}
-                          error={state.cardErrors.expiry}
-                          style={{ height: 48 }}
-                        />
-                        <Input
-                          type="text"
-                          placeholder="CVC"
-                          value={state.cardForm.cvc}
-                          onChange={v => onCardFormChange('cvc', v.replace(/\D/g, '').slice(0, 4))}
-                          error={state.cardErrors.cvc}
-                          style={{ height: 48 }}
-                        />
-                      </div>
-                      <Input
-                        type="text"
-                        placeholder="ZIP / Postal code"
-                        value={state.cardForm.zip}
-                        onChange={v => onCardFormChange('zip', v.replace(/[^a-zA-Z0-9\s-]/g, '').slice(0, 10))}
-                        error={state.cardErrors.zip}
-                        style={{ height: 48 }}
-                      />
-                    </div>
-
-                    <Checkbox
-                      checked={state.cardForm.saveCard}
-                      onChange={v => onCardFormChange('saveCard', v)}
-                      label="Save my card details for future payments"
-                    />
-
-                    <button
-                      onClick={handleSubmitNewCard}
-                      disabled={isPayLoading}
-                      className="w-full h-[48px] text-[15px] leading-5 font-medium text-white flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                      style={{ backgroundColor: pc, borderRadius: br }}
-                    >
-                      {isPayLoading ? <Spinner size={18} color="white" /> : `Pay $${effectiveTotal.toFixed(2)}`}
-                    </button>
-
-                    <p className="text-[11px] leading-4 font-normal text-[#71717a] text-center w-full">
-                      By clicking "Pay" you indicate that you have read, understood and agree to Appcharge's{' '}
-                      <a href="#" className="underline text-[#71717a]">EULA</a>{' '}and{' '}
-                      <a href="#" className="underline text-[#71717a]">Privacy Policy</a>
-                    </p>
-                  </div>
                 </motion.div>
               )}
 
