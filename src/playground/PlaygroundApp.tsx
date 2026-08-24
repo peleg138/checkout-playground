@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { RotateCcw, Smartphone, Monitor, Save, Clock, Trash2, X, Download, Loader2 } from 'lucide-react'
+import { RotateCcw, Smartphone, Monitor, Save, Clock, Trash2, X, Download, Loader2, ChevronDown, Image, Video, Square } from 'lucide-react'
 import appchargeLogo from '../assets/icons/appcharge-logo.png'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ConfigPanel } from './components/ConfigPanel'
@@ -7,6 +7,8 @@ import { AssetsPanel } from './components/AssetsPanel'
 import { CheckoutPreviewWrapper } from './components/CheckoutPreviewWrapper'
 import { DEFAULT_CONFIG } from './defaultConfig'
 import { exportScreenPng } from './exportScreen'
+import { startScreenRecording } from './recordScreen'
+import type { Recording } from './recordScreen'
 import type { PlaygroundConfig } from './types'
 
 type Orientation = 'portrait' | 'landscape' | 'desktop'
@@ -106,6 +108,42 @@ const iconBtn: React.CSSProperties = {
   padding: 0, transition: 'background .12s, color .12s',
 }
 
+function formatElapsed(seconds: number): string {
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`
+}
+
+interface ExportMenuItemProps {
+  icon: React.ReactNode
+  title: string
+  detail: string
+  onClick: () => void
+  divider?: boolean
+}
+
+function ExportMenuItem({ icon, title, detail, onClick, divider }: ExportMenuItemProps) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: 'flex', alignItems: 'flex-start', gap: 10,
+        width: '100%', padding: '10px 14px',
+        background: 'transparent', border: 'none',
+        borderTop: divider ? '1px solid #f4f4f5' : 'none',
+        cursor: 'pointer', textAlign: 'left',
+        fontFamily: 'inherit', transition: 'background .1s',
+      }}
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f9f9fb' }}
+      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+    >
+      <span style={{ color: '#71717a', marginTop: 1, flexShrink: 0 }}>{icon}</span>
+      <span style={{ minWidth: 0 }}>
+        <span style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#18181b' }}>{title}</span>
+        <span style={{ display: 'block', fontSize: 11, color: '#a1a1aa', marginTop: 1 }}>{detail}</span>
+      </span>
+    </button>
+  )
+}
+
 // ── Component ────────────────────────────────────────────────────────────────
 export function PlaygroundApp() {
   const [config, setConfig] = useState<PlaygroundConfig>(
@@ -120,10 +158,15 @@ export function PlaygroundApp() {
   const [configTab, setConfigTab]     = useState<'config' | 'multi-offers'>('config')
 
   const [exporting, setExporting]     = useState(false)
+  const [showExportMenu, setShowExportMenu] = useState(false)
+  const [recording, setRecording]     = useState(false)
+  const [elapsed, setElapsed]         = useState(0)
 
   const historyRef  = useRef<HTMLDivElement>(null)
   const saveInputRef = useRef<HTMLInputElement>(null)
   const frameRef    = useRef<HTMLDivElement>(null)
+  const exportMenuRef = useRef<HTMLDivElement>(null)
+  const recordingRef = useRef<Recording | null>(null)
 
   // Auto-persist current config
   useEffect(() => {
@@ -142,10 +185,33 @@ export function PlaygroundApp() {
     return () => document.removeEventListener('mousedown', handler)
   }, [showHistory])
 
+  // Close export menu on outside click
+  useEffect(() => {
+    if (!showExportMenu) return
+    const handler = (e: MouseEvent) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
+        setShowExportMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [showExportMenu])
+
   // Focus save input when it appears
   useEffect(() => {
     if (showSaveInput) saveInputRef.current?.focus()
   }, [showSaveInput])
+
+  // Tick the recording timer
+  useEffect(() => {
+    if (!recording) return
+    const id = setInterval(() => setElapsed(e => e + 1), 1000)
+    return () => clearInterval(id)
+  }, [recording])
+
+  // A take left running would keep the tab capture alive after the playground
+  // is gone, so drop it if we unmount mid-recording.
+  useEffect(() => () => recordingRef.current?.cancel(), [])
 
   const reset = () => {
     setConfig(DEFAULT_CONFIG)
@@ -170,6 +236,7 @@ export function PlaygroundApp() {
   const exportScreen = async () => {
     const frame = frameRef.current
     if (!frame || exporting) return
+    setShowExportMenu(false)
     setExporting(true)
     try {
       const { width, height, filename } = await exportScreenPng(frame, orientation)
@@ -181,6 +248,48 @@ export function PlaygroundApp() {
       alert('Could not export the screen. See the console for details.')
     } finally {
       setExporting(false)
+    }
+  }
+
+  const finishRecording = async () => {
+    const take = recordingRef.current
+    recordingRef.current = null
+    setRecording(false)
+    if (!take) return
+    try {
+      const { filename, width, height, seconds, sizeBytes } = await take.stop()
+      console.info(
+        `[playground] recorded ${filename} — ${width}×${height}, ${seconds.toFixed(1)}s, ${(sizeBytes / 1048576).toFixed(1)}MB`
+      )
+    } catch (err) {
+      console.error('[playground] recording failed', err)
+      alert('Could not save the recording. See the console for details.')
+    }
+  }
+
+  const startRecording = async () => {
+    const frame = frameRef.current
+    if (!frame || recording) return
+    setShowExportMenu(false)
+    try {
+      // Must stay inside the click's user gesture, so no awaits before this.
+      const take = await startScreenRecording(frame, orientation)
+      recordingRef.current = take
+      // Chrome's own "Stop sharing" ends the capture behind our back; treat it
+      // as a stop rather than silently dropping what was recorded.
+      take.onEndedExternally(() => { void finishRecording() })
+      setElapsed(0)
+      setRecording(true)
+    } catch (err) {
+      // Dismissing the picker lands here too, and that's not an error worth
+      // interrupting anyone over.
+      if ((err as Error)?.name === 'NotAllowedError') return
+      if ((err as Error)?.message === 'WRONG_SURFACE') {
+        alert('Pick this browser tab in the share dialog — recording a whole screen or another window can\'t be cropped to the checkout.')
+        return
+      }
+      console.error('[playground] could not start recording', err)
+      alert('Could not start recording. See the console for details.')
     }
   }
 
@@ -279,24 +388,80 @@ export function PlaygroundApp() {
         {/* Right actions */}
         <div className="flex items-center" style={{ gap: 8 }}>
 
-          {/* Export the device frame on its own, as a 3× PNG */}
-          <button
-            onClick={exportScreen}
-            disabled={exporting}
-            title="Export the checkout screen as a high-resolution PNG"
-            style={{
-              ...ghostBtn,
-              cursor: exporting ? 'default' : 'pointer',
-              color: exporting ? '#a1a1aa' : '#3f3f46',
-            }}
-            onMouseEnter={e => { if (!exporting) (e.currentTarget as HTMLElement).style.background = '#f9f9fb' }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fff' }}
-          >
-            {exporting
-              ? <Loader2 size={13} className="animate-spin" />
-              : <Download size={13} />}
-            {exporting ? 'Exporting…' : 'Export'}
-          </button>
+          {/* Export the device frame on its own — still image or video */}
+          <div ref={exportMenuRef} style={{ position: 'relative' }}>
+            {recording ? (
+              <button
+                onClick={finishRecording}
+                title="Stop recording and save the video"
+                style={{
+                  ...ghostBtn,
+                  background: '#fef2f2',
+                  borderColor: '#fecaca',
+                  color: '#dc2626',
+                }}
+              >
+                <Square size={9} fill="currentColor" />
+                Stop {formatElapsed(elapsed)}
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowExportMenu(o => !o)}
+                disabled={exporting}
+                title="Export the checkout screen"
+                style={{
+                  ...ghostBtn,
+                  background: showExportMenu ? '#f4f4f5' : '#fff',
+                  borderColor: showExportMenu ? '#d4d4d8' : '#e4e4e7',
+                  cursor: exporting ? 'default' : 'pointer',
+                  color: exporting ? '#a1a1aa' : '#3f3f46',
+                }}
+                onMouseEnter={e => { if (!exporting && !showExportMenu) (e.currentTarget as HTMLElement).style.background = '#f9f9fb' }}
+                onMouseLeave={e => { if (!showExportMenu) (e.currentTarget as HTMLElement).style.background = '#fff' }}
+              >
+                {exporting
+                  ? <Loader2 size={13} className="animate-spin" />
+                  : <Download size={13} />}
+                {exporting ? 'Exporting…' : 'Export'}
+                {!exporting && <ChevronDown size={12} style={{ opacity: .5, marginLeft: -1 }} />}
+              </button>
+            )}
+
+            <AnimatePresence>
+              {showExportMenu && (
+                <motion.div
+                  initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -6, scale: 0.97 }}
+                  transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
+                  style={{
+                    position: 'absolute', top: 'calc(100% + 8px)', left: 0,
+                    width: 244,
+                    background: '#fff',
+                    border: '1px solid #e4e4e7',
+                    borderRadius: 10,
+                    boxShadow: '0 8px 24px rgba(0,0,0,.10), 0 2px 8px rgba(0,0,0,.06)',
+                    zIndex: 100,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <ExportMenuItem
+                    icon={<Image size={14} />}
+                    title="Screenshot"
+                    detail="PNG at 3× — the screen as it stands"
+                    onClick={exportScreen}
+                  />
+                  <ExportMenuItem
+                    icon={<Video size={14} />}
+                    title="Record video"
+                    detail="Capture an interaction as it plays"
+                    onClick={startRecording}
+                    divider
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Save button / inline name input */}
           <div style={{ position: 'relative' }}>
