@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { forwardRef, useCallback, useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useCheckoutState } from '../../hooks/useCheckoutState'
 import { CheckoutScreen } from '../../screens/CheckoutScreen'
@@ -39,7 +39,15 @@ interface Props {
   isMultiOffers?: boolean
 }
 
-export function CheckoutPreviewWrapper({ config, orientation = 'portrait', isMultiOffers = false }: Props) {
+/**
+ * The forwarded ref lands on the unscaled inner element — the checkout at its
+ * true device size. PNG export captures that node so it renders at full
+ * resolution instead of rasterising the shrunk-to-fit view.
+ */
+export const CheckoutPreviewWrapper = forwardRef<HTMLDivElement, Props>(function CheckoutPreviewWrapper(
+  { config, orientation = 'portrait', isMultiOffers = false }: Props,
+  innerRef,
+) {
   const {
     state,
     effectiveTotal,
@@ -199,6 +207,7 @@ export function CheckoutPreviewWrapper({ config, orientation = 'portrait', isMul
           rather than to the scrolling checkout content inside it.
         */}
         <div
+          ref={innerRef}
           style={{
             width: innerW,
             height: innerH,
@@ -268,4 +277,4 @@ export function CheckoutPreviewWrapper({ config, orientation = 'portrait', isMul
       </div>
     </AppearanceContext.Provider>
   )
-}
+})

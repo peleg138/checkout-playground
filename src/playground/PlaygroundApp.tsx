@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { RotateCcw, Smartphone, Monitor, Save, Clock, Trash2, X } from 'lucide-react'
+import { RotateCcw, Smartphone, Monitor, Save, Clock, Trash2, X, Download, Loader2 } from 'lucide-react'
 import appchargeLogo from '../assets/icons/appcharge-logo.png'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ConfigPanel } from './components/ConfigPanel'
 import { AssetsPanel } from './components/AssetsPanel'
 import { CheckoutPreviewWrapper } from './components/CheckoutPreviewWrapper'
 import { DEFAULT_CONFIG } from './defaultConfig'
+import { exportScreenPng } from './exportScreen'
 import type { PlaygroundConfig } from './types'
 
 type Orientation = 'portrait' | 'landscape' | 'desktop'
@@ -118,8 +119,11 @@ export function PlaygroundApp() {
   const [saveName, setSaveName]       = useState('')
   const [configTab, setConfigTab]     = useState<'config' | 'multi-offers'>('config')
 
+  const [exporting, setExporting]     = useState(false)
+
   const historyRef  = useRef<HTMLDivElement>(null)
   const saveInputRef = useRef<HTMLInputElement>(null)
+  const frameRef    = useRef<HTMLDivElement>(null)
 
   // Auto-persist current config
   useEffect(() => {
@@ -161,6 +165,23 @@ export function PlaygroundApp() {
     persistVersions(updated)
     setShowSaveInput(false)
     setSaveName('')
+  }
+
+  const exportScreen = async () => {
+    const frame = frameRef.current
+    if (!frame || exporting) return
+    setExporting(true)
+    try {
+      const { width, height, filename } = await exportScreenPng(frame, orientation)
+      console.info(`[playground] exported ${filename} at ${width}×${height}`)
+    } catch (err) {
+      // Nothing downloaded, but the playground itself is fine — say so rather
+      // than leaving the button spinning with no explanation.
+      console.error('[playground] export failed', err)
+      alert('Could not export the screen. See the console for details.')
+    } finally {
+      setExporting(false)
+    }
   }
 
   const restoreVersion = (v: SavedVersion) => {
@@ -257,6 +278,25 @@ export function PlaygroundApp() {
 
         {/* Right actions */}
         <div className="flex items-center" style={{ gap: 8 }}>
+
+          {/* Export the device frame on its own, as a 3× PNG */}
+          <button
+            onClick={exportScreen}
+            disabled={exporting}
+            title="Export the checkout screen as a high-resolution PNG"
+            style={{
+              ...ghostBtn,
+              cursor: exporting ? 'default' : 'pointer',
+              color: exporting ? '#a1a1aa' : '#3f3f46',
+            }}
+            onMouseEnter={e => { if (!exporting) (e.currentTarget as HTMLElement).style.background = '#f9f9fb' }}
+            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fff' }}
+          >
+            {exporting
+              ? <Loader2 size={13} className="animate-spin" />
+              : <Download size={13} />}
+            {exporting ? 'Exporting…' : 'Export'}
+          </button>
 
           {/* Save button / inline name input */}
           <div style={{ position: 'relative' }}>
@@ -501,7 +541,7 @@ export function PlaygroundApp() {
                 transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                 style={{ margin: 'auto' }}
               >
-                <CheckoutPreviewWrapper key={`${previewKey}-${configTab}`} config={config} orientation={orientation} isMultiOffers={configTab === 'multi-offers'} />
+                <CheckoutPreviewWrapper ref={frameRef} key={`${previewKey}-${configTab}`} config={config} orientation={orientation} isMultiOffers={configTab === 'multi-offers'} />
               </motion.div>
             </AnimatePresence>
           </div>
