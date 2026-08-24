@@ -26,8 +26,24 @@ function loadVersions(): SavedVersion[] {
   try { return JSON.parse(localStorage.getItem(VERSIONS_KEY) ?? '[]') } catch { return [] }
 }
 
+/**
+ * Uploaded images are stored inline as base64, so a big one can blow the
+ * localStorage quota. setItem throws synchronously when that happens, and an
+ * unguarded throw here unmounts the whole playground — a white page. Losing
+ * the saved copy is survivable; losing the app is not.
+ */
+function safeSetItem(key: string, value: string): boolean {
+  try {
+    localStorage.setItem(key, value)
+    return true
+  } catch (err) {
+    console.warn(`[playground] could not persist "${key}" (${(value.length / 1048576).toFixed(1)}MB). Working copy is unaffected.`, err)
+    return false
+  }
+}
+
 function persistVersions(v: SavedVersion[]) {
-  localStorage.setItem(VERSIONS_KEY, JSON.stringify(v))
+  safeSetItem(VERSIONS_KEY, JSON.stringify(v))
 }
 
 function loadCurrentConfig(): PlaygroundConfig | null {
@@ -107,7 +123,7 @@ export function PlaygroundApp() {
 
   // Auto-persist current config
   useEffect(() => {
-    localStorage.setItem(CURRENT_KEY, JSON.stringify(stripBlobUrls(config)))
+    safeSetItem(CURRENT_KEY, JSON.stringify(stripBlobUrls(config)))
   }, [config])
 
   // Close history dropdown on outside click

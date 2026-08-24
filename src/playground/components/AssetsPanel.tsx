@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { X, Plus } from 'lucide-react'
 import type { PlaygroundConfig } from '../types'
+import { readImageFile } from '../downscaleImage'
 
 interface Props {
   config: PlaygroundConfig
@@ -118,9 +119,9 @@ function UploadRow({ label, value, onUpload, onClear, objectFit = 'contain' }: U
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    const reader = new FileReader()
-    reader.onload = ev => { if (ev.target?.result) onUpload(ev.target.result as string) }
-    reader.readAsDataURL(file)
+    readImageFile(file)
+      .then(onUpload)
+      .catch(err => console.warn('[playground] could not read image', err))
     e.target.value = ''
   }
 
