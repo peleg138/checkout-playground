@@ -108,7 +108,7 @@ export function CheckoutScreen({
   }
 
   return (
-    <div className="flex flex-col bg-white">
+    <div className="flex flex-col grow bg-white">
       {/* Header */}
       <CheckoutHeader
         expanded={state.headerExpanded}
@@ -332,7 +332,9 @@ export function CheckoutScreen({
         </AnimatePresence>
       </div>
 
-      {!showOtherSheet && <CheckoutFooter />}
+      {/* mt-auto pins the footer to the bottom of the frame whenever the
+          content above it is shorter than the frame. */}
+      {!showOtherSheet && <div className="mt-auto"><CheckoutFooter /></div>}
 
       <SavedCardsSheet
         isOpen={showSavedCardsSheet}

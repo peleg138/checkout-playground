@@ -235,8 +235,14 @@ export function CheckoutPreviewWrapper({ config, orientation = 'portrait', isMul
               </div>
             ) : (
               <AnimatePresence mode="wait">
+                {/*
+                  minHeight 100% lets the checkout fill the frame when its
+                  content is short (collapsed details), so the footer can sit at
+                  the bottom instead of floating mid-frame. It still grows past
+                  the frame and scrolls when the content is tall.
+                */}
                 {state.screen === 'checkout' && (
-                  <motion.div key="checkout" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} style={isDesktopLayout ? { height: '100%' } : undefined}>
+                  <motion.div key="checkout" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} style={isDesktopLayout ? { height: '100%' } : { minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
                     {checkoutNode}
                   </motion.div>
                 )}
