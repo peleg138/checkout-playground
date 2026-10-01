@@ -90,6 +90,15 @@ export const DEFAULT_CONFIG: PlaygroundConfig = {
     fit: 'cover',
     offerImages: [OFFER_1, OFFER_2, OFFER_3_STAIRCASE],
   },
+  upsell: {
+    variant: 'cart',
+    discountPercent: 20,
+    showCountdown: true,
+    countdownSeconds: 120,
+    showPackSelector: true,
+    widgetOfferCount: 2,
+    showMilestone: true,
+  },
   appearance: {
     primaryColor: '#448ae3',
     buttonRadius: 6,

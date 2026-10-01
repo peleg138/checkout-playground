@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useState } from 'react'
+import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useCheckoutState } from '../../hooks/useCheckoutState'
 import { CheckoutScreen } from '../../screens/CheckoutScreen'
@@ -6,6 +6,9 @@ import { DesktopCheckoutScreen } from '../../screens/DesktopCheckoutScreen'
 import { ProcessingScreen } from '../../screens/ProcessingScreen'
 import { SuccessScreen } from '../../screens/SuccessScreen'
 import { DeclinedScreen } from '../../screens/DeclinedScreen'
+import { UpsellAdvanced } from '../../components/Upsell/UpsellAdvanced'
+import { DEFAULT_CONFIG } from '../defaultConfig'
+import type { UpsellAdded } from '../../types/upsell'
 import { AppearanceContext } from '../AppearanceContext'
 import type { PlaygroundConfig } from '../types'
 
@@ -37,6 +40,12 @@ interface Props {
   config: PlaygroundConfig
   orientation?: 'portrait' | 'landscape' | 'desktop'
   isMultiOffers?: boolean
+  /**
+   * Bumped by the sidebar's "Jump to offer" button. Reviewing the upsell
+   * otherwise means completing a payment first, which is a lot of clicks for
+   * a screen that is the whole point of the review.
+   */
+  upsellJump?: number
 }
 
 /**
@@ -45,7 +54,7 @@ interface Props {
  * resolution instead of rasterising the shrunk-to-fit view.
  */
 export const CheckoutPreviewWrapper = forwardRef<HTMLDivElement, Props>(function CheckoutPreviewWrapper(
-  { config, orientation = 'portrait', isMultiOffers = false }: Props,
+  { config, orientation = 'portrait', isMultiOffers = false, upsellJump = 0 }: Props,
   innerRef,
 ) {
   const {
@@ -68,6 +77,18 @@ export const CheckoutPreviewWrapper = forwardRef<HTMLDivElement, Props>(function
   } = useCheckoutState(config.promo.validCodes, !isMultiOffers)
 
   const [visible, setVisible] = useState(true)
+
+  // Configs saved before the upsell existed have no block — fall back so an
+  // old localStorage entry can't take the playground down.
+  const upsell = config.upsell ?? DEFAULT_CONFIG.upsell
+  const upsellVariant = upsell.variant
+  // All three Advanced options are the confirmation screen itself — nothing
+  // follows them, so a successful payment lands here instead of on success.
+  const isInterstitialFlow = upsellVariant !== 'off'
+
+  /** Items claimed post-payment, appended to the order the player already paid for. */
+  const [added, setAdded] = useState<UpsellAdded[]>([])
+  const addedTotal = added.reduce((sum, a) => sum + a.price, 0)
 
   // Sync playground config → checkout state
   useEffect(() => {
@@ -92,10 +113,44 @@ export const CheckoutPreviewWrapper = forwardRef<HTMLDivElement, Props>(function
     }
   }, [config.paymentMethods, state.selectedPaymentMethod, setPaymentMethod])
 
+  // Claims belong to the variant that produced them — carrying one across a
+  // variant switch leaves a stranded add-on on the next variant's screen.
+  useEffect(() => { setAdded([]) }, [upsellVariant])
+
+  // Turning the upsell off (or switching to the widget) while the offer screen
+  // is showing would otherwise leave it stranded on a screen that no longer
+  // belongs to the flow.
+  useEffect(() => {
+    if (state.screen === 'upsell' && !isInterstitialFlow) setScreen('success')
+  }, [state.screen, isInterstitialFlow, setScreen])
+
+  // Sidebar jump: land straight on whichever screen the variant lives on.
+  const variantRef = useRef(upsellVariant)
+  variantRef.current = upsellVariant
+
+  useEffect(() => {
+    if (upsellJump === 0) return
+    setVisible(true)
+    setAdded([])
+    setScreen('upsell')
+  }, [upsellJump, setScreen])
+
   const handleClose = useCallback(() => setVisible(false), [])
   const handleOpen = useCallback(() => setVisible(true), [])
-  const handleProcessingDone = useCallback((result: 'success' | 'declined') => setScreen(result), [setScreen])
-  const handleReturnToGame = useCallback(() => { reset(); setVisible(false) }, [reset])
+  const handleProcessingDone = useCallback((result: 'success' | 'declined') => {
+    // The offer slots in between payment and confirmation — never after a decline.
+    if (result === 'success' && isInterstitialFlow) return setScreen('upsell')
+    setScreen(result)
+  }, [setScreen, isInterstitialFlow])
+  const handleReturnToGame = useCallback(() => { reset(); setAdded([]); setVisible(false) }, [reset])
+  const handleUpsellAdd = useCallback((item: UpsellAdded) => {
+    setAdded(prev => prev.some(a => a.id === item.id) ? prev : [...prev, item])
+    setScreen('success')
+  }, [setScreen])
+  const handleUpsellDecline = useCallback(() => setScreen('success'), [setScreen])
+  const handleWidgetClaim = useCallback((item: UpsellAdded) => {
+    setAdded(prev => prev.some(a => a.id === item.id) ? prev : [...prev, item])
+  }, [])
   const handleTryAgain = useCallback(() => setScreen('checkout'), [setScreen])
   const handleUseDifferentCard = useCallback(() => { setScreen('checkout'); setPaymentMethod('card') }, [setScreen, setPaymentMethod])
   const handleApplePay = useCallback(() => setScreen('processing'), [setScreen])
@@ -261,8 +316,33 @@ export const CheckoutPreviewWrapper = forwardRef<HTMLDivElement, Props>(function
                   </motion.div>
                 )}
                 {state.screen === 'success' && (
-                  <motion.div key="success" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <SuccessScreen effectiveTotal={effectiveTotal} onReturnToGame={handleReturnToGame} isDesktop={isDesktop} />
+                  <motion.div
+                    key="success"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      display: 'flex',
+                      // The widget makes the screen taller than the frame, so it
+                      // scrolls from the top instead of centring. Without a
+                      // widget the layout is untouched.
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflowY: 'visible',
+                    }}
+                  >
+                    <SuccessScreen
+                      effectiveTotal={effectiveTotal + addedTotal}
+                      onReturnToGame={handleReturnToGame}
+                      isDesktop={isDesktop}
+                      extraItems={added.length > 0
+                        ? added.map(a => ({ id: a.id, name: a.title, price: a.price, icon: a.icon }))
+                        : undefined}
+                    />
                   </motion.div>
                 )}
                 {state.screen === 'declined' && (
@@ -272,6 +352,30 @@ export const CheckoutPreviewWrapper = forwardRef<HTMLDivElement, Props>(function
                 )}
               </AnimatePresence>
             )}
+
+            {/* Upsell screen — its own presence tree, layered over the frame. */}
+            <AnimatePresence>
+                {state.screen === 'upsell' && upsellVariant !== 'off' && (
+                  <motion.div
+                    key="upsell"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    style={{ position: 'absolute', inset: 0 }}
+                  >
+                    <UpsellAdvanced
+                      key={upsellJump}
+                      mode={upsellVariant}
+                      discountPercent={upsell.discountPercent}
+                      offerCount={upsell.widgetOfferCount}
+                      showCountdown={upsell.showCountdown}
+                      countdownSeconds={upsell.countdownSeconds}
+                      onReturnToGame={handleReturnToGame}
+                    />
+                  </motion.div>
+                )}
+            </AnimatePresence>
           </div>
         </div>
       </div>

@@ -4,17 +4,21 @@ import { PaymentMethodsSection } from '../sections/PaymentMethodsSection'
 import { ProductsSection } from '../sections/ProductsSection'
 import { PromoSection } from '../sections/PromoSection'
 import { AppearanceSection } from '../sections/AppearanceSection'
+import { UpsellSection } from '../sections/UpsellSection'
+import { DEFAULT_CONFIG } from '../defaultConfig'
 
 interface Props {
   config: PlaygroundConfig
   onChange: (c: PlaygroundConfig) => void
   activeTab: 'config' | 'multi-offers'
   onTabChange: (tab: 'config' | 'multi-offers') => void
+  /** Jumps the preview to the active upsell variant's screen. */
+  onJumpToUpsell?: () => void
 }
 
-type Section = 'payments' | 'products' | 'appearance' | 'promo'
+type Section = 'payments' | 'products' | 'appearance' | 'promo' | 'upsell'
 
-export function ConfigPanel({ config, onChange, activeTab, onTabChange }: Props) {
+export function ConfigPanel({ config, onChange, activeTab, onTabChange, onJumpToUpsell }: Props) {
   const [openSection, setOpenSection] = useState<Section | null>(null)
   const toggle = (s: Section) => setOpenSection(prev => prev === s ? null : s)
 
@@ -85,6 +89,13 @@ export function ConfigPanel({ config, onChange, activeTab, onTabChange }: Props)
             isOpen={openSection === 'promo'}
             onToggle={() => toggle('promo')}
           />
+          <UpsellSection
+            config={config.upsell ?? DEFAULT_CONFIG.upsell}
+            onChange={upsell => onChange({ ...config, upsell })}
+            onJump={onJumpToUpsell}
+            isOpen={openSection === 'upsell'}
+            onToggle={() => toggle('upsell')}
+          />
         </div>
       )}
 
@@ -134,6 +145,13 @@ export function ConfigPanel({ config, onChange, activeTab, onTabChange }: Props)
             onChange={promo => onChange({ ...config, promo })}
             isOpen={openSection === 'promo'}
             onToggle={() => toggle('promo')}
+          />
+          <UpsellSection
+            config={config.upsell ?? DEFAULT_CONFIG.upsell}
+            onChange={upsell => onChange({ ...config, upsell })}
+            onJump={onJumpToUpsell}
+            isOpen={openSection === 'upsell'}
+            onToggle={() => toggle('upsell')}
           />
         </div>
       )}

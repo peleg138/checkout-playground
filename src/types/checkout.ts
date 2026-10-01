@@ -1,4 +1,4 @@
-export type Screen = 'checkout' | 'processing' | 'success' | 'declined'
+export type Screen = 'checkout' | 'processing' | 'upsell' | 'success' | 'declined'
 
 export type PaymentMethod = 'card' | 'paypal' | 'gpay' | 'other'
 

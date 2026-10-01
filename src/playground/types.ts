@@ -1,3 +1,5 @@
+import type { UpsellVariant } from '../types/upsell'
+
 export interface AppearanceConfig {
   primaryColor: string
   buttonRadius: number
@@ -69,6 +71,21 @@ export interface CheckoutModeConfig {
   userMode: 'new' | 'saved'
 }
 
+export interface UpsellConfig {
+  variant: UpsellVariant
+  /** Drives the live price off each offer's anchor price. */
+  discountPercent: number
+  /** Variant A only — urgency banner with a running clock. */
+  showCountdown: boolean
+  countdownSeconds: number
+  /** Variant B only — pack size selector inside the offer card. */
+  showPackSelector: boolean
+  /** Variant C only — number of parallel offers (1-2). */
+  widgetOfferCount: number
+  /** Variant C only — the progress-triggered milestone bundle. */
+  showMilestone: boolean
+}
+
 export interface PlaygroundConfig {
   checkoutMode: CheckoutModeConfig
   paymentMethods: PaymentMethodConfig[]
@@ -76,4 +93,5 @@ export interface PlaygroundConfig {
   promo: PromoConfig
   background: BackgroundConfig
   appearance: AppearanceConfig
+  upsell: UpsellConfig
 }

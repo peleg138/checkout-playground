@@ -147,7 +147,9 @@ function ExportMenuItem({ icon, title, detail, onClick, divider }: ExportMenuIte
 // ── Component ────────────────────────────────────────────────────────────────
 export function PlaygroundApp() {
   const [config, setConfig] = useState<PlaygroundConfig>(
-    () => loadCurrentConfig() ?? DEFAULT_CONFIG
+    // Spread over the defaults so a config saved before a new block existed
+    // (e.g. upsell) still loads with every key present.
+    () => { const saved = loadCurrentConfig(); return saved ? { ...DEFAULT_CONFIG, ...saved } : DEFAULT_CONFIG }
   )
   const [previewKey, setPreviewKey]   = useState(0)
   const [orientation, setOrientation] = useState<Orientation>('portrait')
@@ -156,6 +158,8 @@ export function PlaygroundApp() {
   const [showSaveInput, setShowSaveInput] = useState(false)
   const [saveName, setSaveName]       = useState('')
   const [configTab, setConfigTab]     = useState<'config' | 'multi-offers'>('config')
+  // Counter, not a boolean — every click has to re-fire, including repeats.
+  const [upsellJump, setUpsellJump]   = useState(0)
 
   const [exporting, setExporting]     = useState(false)
   const [showExportMenu, setShowExportMenu] = useState(false)
@@ -294,7 +298,7 @@ export function PlaygroundApp() {
   }
 
   const restoreVersion = (v: SavedVersion) => {
-    setConfig(v.config)
+    setConfig({ ...DEFAULT_CONFIG, ...v.config })
     setPreviewKey(k => k + 1)
     setShowHistory(false)
   }
@@ -686,7 +690,7 @@ export function PlaygroundApp() {
       >
         {/* Left sidebar */}
         <div style={{ width: 318, flexShrink: 0, height: '100%', borderRadius: 12, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,.08)' }}>
-          <ConfigPanel config={config} onChange={setConfig} activeTab={configTab} onTabChange={setConfigTab} />
+          <ConfigPanel config={config} onChange={setConfig} activeTab={configTab} onTabChange={setConfigTab} onJumpToUpsell={() => setUpsellJump(n => n + 1)} />
         </div>
 
         {/* Center canvas */}
@@ -706,7 +710,7 @@ export function PlaygroundApp() {
                 transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                 style={{ margin: 'auto' }}
               >
-                <CheckoutPreviewWrapper ref={frameRef} key={`${previewKey}-${configTab}`} config={config} orientation={orientation} isMultiOffers={configTab === 'multi-offers'} />
+                <CheckoutPreviewWrapper ref={frameRef} key={`${previewKey}-${configTab}`} config={config} orientation={orientation} isMultiOffers={configTab === 'multi-offers'} upsellJump={upsellJump} />
               </motion.div>
             </AnimatePresence>
           </div>

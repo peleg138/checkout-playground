@@ -22,3 +22,71 @@ body {
     display: none;
   }
 }
+
+/*
+  Specular sweep for the upsell's primary CTA.
+
+  Percentages in translateX resolve against the BAND's own width, not the
+  button's — which is what made the first version look stuck. The band is a
+  third of the button (114px), so the old 260% moved it only 297px across a
+  343px button and parked it with 46px still showing against the right edge for
+  most of every cycle. Clearing the button needs 307%; 320% leaves ~15px of
+  margin, including the ~16px the 20deg skew throws sideways.
+
+  Timing is a steady rhythm rather than a glint-then-wait: the sweep occupies
+  65% of the cycle and the gap is short enough to read as ongoing motion, while
+  still being a gap — a seamless marquee would read as a loading bar.
+
+  Only transform animates, so it composites on the GPU and stays smooth.
+*/
+@keyframes cta-shine {
+  0%   { transform: translateX(-110%) skewX(-20deg); }
+  65%  { transform: translateX(145%) skewX(-20deg); }
+  100% { transform: translateX(145%) skewX(-20deg); }
+}
+
+/*
+  2.8s, not 2.4s: the band is now three quarters of the button, so the sweep
+  covers 656px instead of 566px. Holding the old duration would have pushed it
+  from 363px/s to 421px/s — a wider, softer highlight moving faster reads as a
+  flash. 2.8s puts it back at 360px/s, the speed that already felt right.
+*/
+.animate-cta-shine {
+  animation: cta-shine 2.8s linear infinite;
+}
+
+/*
+  The lit surface the sheen travels across.
+
+  A moving highlight only reads as light if the thing it crosses looks glossy,
+  so the button carries a 1px inset top edge — the same trick a physical glossy
+  surface does with the sky above it. Under that: a tight contact shadow, then a
+  wide bloom tinted with the button's own fill, set from --cta-glow so it tracks
+  whatever primary colour the playground is on. Unset, it resolves to
+  transparent and the button simply has no glow.
+
+  The bloom tightens on press. A button that scales down while its glow stays
+  wide looks like it detached from the surface rather than being pushed into it.
+*/
+.cta-surface {
+  transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 1px 2px rgba(0, 0, 0, 0.10),
+    0 6px 18px -4px var(--cta-glow, transparent);
+}
+
+.cta-surface:active {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 1px 2px rgba(0, 0, 0, 0.10),
+    0 3px 10px -4px var(--cta-glow, transparent);
+}
+
+/* Motion for decoration only — the first thing to go when it isn't wanted. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-cta-shine {
+    animation: none;
+    opacity: 0;
+  }
+}
