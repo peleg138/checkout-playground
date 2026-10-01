@@ -92,6 +92,7 @@ export const DEFAULT_CONFIG: PlaygroundConfig = {
   },
   upsell: {
     variant: 'cart',
+    payWith: 'card',
     discountPercent: 20,
     showCountdown: true,
     countdownSeconds: 120,

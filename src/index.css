@@ -90,3 +90,32 @@ body {
     opacity: 0;
   }
 }
+
+/*
+  The wallet side-button prompt. Two quick flashes and then a rest, which is
+  the cadence of a double press — a steady pulse would read as "hold", and a
+  single flash as "press once".
+*/
+@keyframes wallet-confirm-press {
+  0%, 100% { opacity: 0.25; transform: translateX(0); }
+  8%       { opacity: 1;    transform: translateX(3px); }
+  20%      { opacity: 0.25; transform: translateX(0); }
+  28%      { opacity: 1;    transform: translateX(3px); }
+  40%      { opacity: 0.25; transform: translateX(0); }
+}
+
+@keyframes wallet-confirm-button {
+  0%, 100% { opacity: 0.55; }
+  8%       { opacity: 1; }
+  20%      { opacity: 0.55; }
+  28%      { opacity: 1; }
+  40%      { opacity: 0.55; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [style*="wallet-confirm-press"],
+  [style*="wallet-confirm-button"] {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}

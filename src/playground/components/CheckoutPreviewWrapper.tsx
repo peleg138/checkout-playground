@@ -367,6 +367,7 @@ export const CheckoutPreviewWrapper = forwardRef<HTMLDivElement, Props>(function
                     <UpsellAdvanced
                       key={upsellJump}
                       mode={upsellVariant}
+                      payWith={upsell.payWith ?? 'card'}
                       discountPercent={upsell.discountPercent}
                       offerCount={upsell.widgetOfferCount}
                       showCountdown={upsell.showCountdown}

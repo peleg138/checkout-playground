@@ -1,6 +1,9 @@
 import React, { useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check, X, Timer } from 'lucide-react'
+import { CardBrandIcon } from '../Payment/PaymentIcons'
+import { WalletMark, WALLET_LABEL } from './WalletMarks'
+import type { UpsellPayMethod } from './WalletMarks'
 import { useAppearance } from '../../playground/AppearanceContext'
 import { CheckoutFooter } from '../Footer/CheckoutFooter'
 import { UpsellPaySheet } from './UpsellPaySheet'
@@ -14,6 +17,7 @@ export type AdvancedMode = 'cart' | 'carousel' | 'oneTap'
 
 interface Props {
   mode: AdvancedMode
+  payWith: UpsellPayMethod
   discountPercent: number
   /** Carousel only — how many cards to swipe through. */
   offerCount: number
@@ -24,12 +28,13 @@ interface Props {
 
 /** One offer card. Identical in all three modes apart from its CTA. */
 function OfferCard({
-  offer, price, currency, mode, busy, added, onAct, primaryColor, radius,
+  offer, price, currency, mode, payWith, busy, added, onAct, primaryColor, radius,
 }: {
   offer: UpsellRowOffer
   price: number
   currency: string
   mode: AdvancedMode
+  payWith: UpsellPayMethod
   busy: boolean
   added: boolean
   onAct: () => void
@@ -90,11 +95,23 @@ function OfferCard({
         </button>
       )}
 
-      <p className="text-[12px] leading-4 font-normal text-[#71717a] text-center tabular-nums">
-        {oneTap
-          ? `Charged automatically to Visa ${upsellAdvancedOrder.cardLast4}`
-          : `Charged to the same card, Visa ${upsellAdvancedOrder.cardLast4}`}
-      </p>
+      {/*
+        A wallet charge still runs against a card, so both marks show: the
+        wallet that authorises it and the instrument behind it.
+      */}
+      <div className="flex items-center justify-center gap-1.5">
+        <WalletMark method={payWith} />
+        <CardBrandIcon brand={upsellAdvancedOrder.cardBrand} className="!w-[30px] !h-[20px]" />
+        <span className="text-[12px] leading-4 font-normal text-[#71717a] tabular-nums">
+          {payWith === 'card'
+            ? (oneTap
+                ? `Charged automatically to Visa ${upsellAdvancedOrder.cardLast4}`
+                : `Charged to the same card, Visa ${upsellAdvancedOrder.cardLast4}`)
+            : (oneTap
+                ? `Charged automatically with ${WALLET_LABEL[payWith]}`
+                : `Charged with ${WALLET_LABEL[payWith]}, Visa ${upsellAdvancedOrder.cardLast4}`)}
+        </span>
+      </div>
     </div>
   )
 }
@@ -111,7 +128,7 @@ function OfferCard({
  * which action model to ship, not which layout.
  */
 export function UpsellAdvanced({
-  mode, discountPercent, offerCount, showCountdown, countdownSeconds, onReturnToGame,
+  mode, payWith, discountPercent, offerCount, showCountdown, countdownSeconds, onReturnToGame,
 }: Props) {
   const { appearance, products } = useAppearance()
   const currency = products.currency
@@ -194,7 +211,7 @@ export function UpsellAdvanced({
         */}
         <div className="bg-[#f0fdf4] rounded-[8px] px-3 py-2.5 flex-shrink-0" role="status">
           <p className="text-[14px] leading-5 font-semibold text-[#15803d]">Payment Successful</p>
-          <p className="text-[12px] leading-4 font-normal text-[#4d7c5f] mt-0.5 tabular-nums">
+          <p className="text-[12px] leading-4 font-normal text-[#4d7c5f] mt-1.5 tabular-nums">
             {money(upsellAdvancedOrder.paidAmount, currency)} charged to Visa {upsellAdvancedOrder.cardLast4}
             <span className="mx-1.5 text-[#86bf9b]">·</span>
             Order {upsellAdvancedOrder.orderId}
@@ -248,6 +265,7 @@ export function UpsellAdvanced({
                     price={priceOf(offer)}
                     currency={currency}
                     mode={mode}
+                    payWith={payWith}
                     busy={pending === offer.id}
                     added={added.some(a => a.id === offer.id)}
                     onAct={() => act(offer)}
@@ -280,6 +298,7 @@ export function UpsellAdvanced({
               price={priceOf(offers[0])}
               currency={currency}
               mode={mode}
+              payWith={payWith}
               busy={pending === offers[0].id}
               added={added.some(a => a.id === offers[0].id)}
               onAct={() => act(offers[0])}
@@ -305,6 +324,7 @@ export function UpsellAdvanced({
 
       <UpsellPaySheet
         open={sheetFor !== null}
+        payWith={payWith}
         offer={sheetFor}
         price={sheetFor ? priceOf(sheetFor) : 0}
         currency={currency}

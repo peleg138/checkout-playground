@@ -68,6 +68,18 @@ export function UpsellSection({ config, onChange, onJump, isOpen, onToggle }: Pr
 
             <div style={{ height: 1, background: '#e4e4e7', marginTop: 4 }} />
 
+            <ControlRow label="Pay with">
+              <SegmentedControl
+                options={[
+                  { value: 'card', label: 'Card' },
+                  { value: 'applePay', label: 'Apple' },
+                  { value: 'googlePay', label: 'Google' },
+                ]}
+                value={config.payWith ?? 'card'}
+                onChange={v => set('payWith', v as UpsellConfig['payWith'])}
+              />
+            </ControlRow>
+
             <ControlRow label={`Discount — ${config.discountPercent}%`}>
               <div style={{ width: 110 }}>
                 <RangeSlider

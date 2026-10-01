@@ -1,4 +1,5 @@
 import type { UpsellVariant } from '../types/upsell'
+import type { UpsellPayMethod } from '../components/Upsell/WalletMarks'
 
 export interface AppearanceConfig {
   primaryColor: string
@@ -73,6 +74,8 @@ export interface CheckoutModeConfig {
 
 export interface UpsellConfig {
   variant: UpsellVariant
+  /** Whether the second charge runs on the stored card or through a wallet. */
+  payWith: UpsellPayMethod
   /** Drives the live price off each offer's anchor price. */
   discountPercent: number
   /** Variant A only — urgency banner with a running clock. */
