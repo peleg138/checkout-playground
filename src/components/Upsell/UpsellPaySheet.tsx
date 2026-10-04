@@ -106,6 +106,8 @@ export function UpsellPaySheet({ open, payWith, offer, price, currency, paying, 
               </button>
             </div>
 
+            <div className="h-px bg-[#e4e4e7]" />
+
             {/* What is actually being bought — picture, name, quantity. The
                 price is the Total directly below, so it is not repeated. */}
             <AnimatePresence initial={false}>
@@ -117,7 +119,7 @@ export function UpsellPaySheet({ open, payWith, offer, price, currency, paying, 
                   transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
                   className="overflow-hidden"
                 >
-                  <div className="flex items-center gap-2.5 border-t border-[#e4e4e7] pt-3">
+                  <div className="flex items-center gap-2.5 border-b border-[#e4e4e7] pb-3">
                     <div className="w-9 h-9 rounded-[6px] overflow-hidden flex-shrink-0">
                       <img src={offer.icon} className="w-full h-full object-cover block" alt="" />
                     </div>
