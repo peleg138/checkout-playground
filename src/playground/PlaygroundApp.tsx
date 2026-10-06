@@ -656,25 +656,22 @@ export function PlaygroundApp() {
             style={{
               height: 34,
               padding: '0 16px',
-              background: '#6366f1',
+              background: '#71717a',
               border: 'none',
               borderRadius: 8,
               color: '#fff',
               fontSize: 14,
               fontWeight: 500,
               cursor: 'pointer',
-              boxShadow: '0 0 5px rgba(99,102,241,.5)',
-              transition: 'background .15s, box-shadow .15s',
+              transition: 'background .15s',
               whiteSpace: 'nowrap',
               fontFamily: 'inherit',
             }}
             onMouseEnter={e => {
-              (e.currentTarget as HTMLButtonElement).style.background = '#4f46e5'
-              ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 10px rgba(99,102,241,.6)'
+              (e.currentTarget as HTMLButtonElement).style.background = '#52525b'
             }}
             onMouseLeave={e => {
-              (e.currentTarget as HTMLButtonElement).style.background = '#6366f1'
-              ;(e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 5px rgba(99,102,241,.5)'
+              (e.currentTarget as HTMLButtonElement).style.background = '#71717a'
             }}
           >
             <RotateCcw size={13} />
